@@ -8,7 +8,13 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use kartik\date\DatePicker;
 
-$this->title = Yii::t('app', 'K-means by Sympthomp');
+$this->title = Yii::t('app', 'K-means - '.$title);
+
+if($title == 'Simtom'){
+  $kmeans_type = 'symtomp';
+}else{
+  $kmeans_type = 'teknisi';
+}
 
 $connection = \Yii::$app->db;
 $headTable = $connection->createCommand("SELECT * FROM cases GROUP BY regional ORDER BY regional ASC")->queryAll();
@@ -73,7 +79,7 @@ FROM cases AS a INNER JOIN symptom AS b ON b.id=a.symptomp GROUP BY a.symptomp O
           'onclick' => "
             if(confirm('Clear Cluster ?')){
               $.ajax({
-                url:'clear-cluster',
+                url:'".Url::to(['clear-cluster','title'=>$kmeans_type])."',
                 type: 'post',
                 success: function(){
                   $.pjax.reload({container:'#pjx-cluster-grid'});
@@ -88,7 +94,7 @@ FROM cases AS a INNER JOIN symptom AS b ON b.id=a.symptomp GROUP BY a.symptomp O
 </div>
 
 <?php
-  $cek_cluster = $connection->createCommand("SELECT * FROM count_cluster WHERE `login`='$user->id' ORDER BY id DESC")->queryOne();
+  $cek_cluster = $connection->createCommand("SELECT * FROM count_cluster WHERE `login`='$user->id' AND kmeans_type='$kmeans_type' ORDER BY id DESC")->queryOne();
 ?>
 <div class="case-sympthomp-index" style="margin-top:40px;">
   <?php Pjax::begin(['id' => 'pjx-cluster-grid', 'enablePushState' => false]); ?>
@@ -102,6 +108,7 @@ FROM cases AS a INNER JOIN symptom AS b ON b.id=a.symptomp GROUP BY a.symptomp O
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
+        'id' => 'sympthomp-grid',
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -155,16 +162,21 @@ FROM cases AS a INNER JOIN symptom AS b ON b.id=a.symptomp GROUP BY a.symptomp O
     <?php Pjax::end(); ?>
 </div>
 <div id="button-check-cluster">
-
   <?= Html::button(Yii::t('app', 'Next Centroid'), [
       // 'value' => Url::to('clear-cluster'),
       'class' => 'btn btn-primary',
       'id' => 'next-button',
       'style' => "display:none;",
       'onclick' => "
-        var jumlahCluster = $('#id-total-first-centroid').text();
-        var numberOfChecked = $('input:checkbox:checked').length;
-        alert(jumlahCluster);
+        var keys = $('#sympthomp-grid').yiiGridView('getSelectedRows');
+        $.ajax({
+          url: '".Url::to(['cek-iterasi','title'=>$kmeans_type])."',
+          type: 'post',
+          data: {keylist:keys},
+          success: function(result){
+            console.log(result);
+          }
+        });
       "
       ]);
   ?>

@@ -2,6 +2,18 @@ html,
 body {
     height: 100%;
 }
+.user-lg{
+    width:100%;
+    max-width: 900px;
+}
+#id_chart_cluster{
+    width:50%;
+}
+#btn-next-centroid{
+    position: fixed;
+    top: 60px;
+    right: 50px;
+}
 #button-check-cluster{
     position: fixed;
     top: 150px;
