@@ -68,6 +68,35 @@ class SiteController extends Controller
         ];
     }
 
+    public function actionDisplayData($id, $type)
+    {
+      $connection = \Yii::$app->db;
+      $data = $connection->createCommand("SELECT * FROM list_centroid WHERE id='$id'")->queryOne();
+
+      if($type=='count'){
+        $cek_data = $connection->createCommand("SELECT * FROM list_centroid as a
+        INNER JOIN count_symptom as b ON b.id=a.count_symptom
+        INNER JOIN symptom as c ON c.id=b.symptom
+        WHERE a.kmeans_type='$data[kmeans_type]' AND a.cluster='$data[cluster]' AND b.kmeans_type='$data[kmeans_type]' GROUP BY c.id")->queryAll();
+        return $this->render('/site/display-data-count',[
+          'cek_data' => $cek_data,
+          'data' => $data
+        ]);
+      }elseif($type == 'symptom'){
+        $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$data[kmeans_type]' ORDER BY id desc")->queryOne();
+        $cek_data = $connection->createCommand("SELECT *, e.regional as tregional,b.symptom AS tsymptom FROM cases AS a 
+          INNER JOIN symptom AS b ON b.id=a.symptomp
+          INNER JOIN regional AS e ON e.id=a.regional
+          INNER JOIN count_symptom AS c ON c.symptom=b.id
+          INNER JOIN list_centroid AS d ON d.count_symptom=c.id
+          WHERE date(a.date_open)>='$cek_tgl[start_date]' AND date(a.date_open) <= '$cek_tgl[end_date]' AND d.cluster='$data[cluster]' AND d.kmeans_type='$data[kmeans_type]' GROUP BY a.trouble_ticket")->queryAll();
+        return $this->render('/site/display-data-symtomp',[
+          'cek_data' => $cek_data,
+          'data' => $data
+        ]);
+      }
+    }
+
     public function actionTechnisian()
     {
       $connection = \Yii::$app->db;

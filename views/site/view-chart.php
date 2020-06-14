@@ -19,11 +19,14 @@ $sum_value = [];
 $c2 = 0;
 
 $cluster = [];
+$cekid = [];
+$cekid2 = [];
 $count_cluster = [];
 $c1 = 0;
 foreach($list_count_cluster as $l => $lc):
   $cls = $connection->createCommand("SELECT COUNT(*) FROM list_centroid WHERE login='$user->id' AND kmeans_type='$t' AND iterasi='$max_iterasi' AND cluster='$lc[cluster]'")->queryScalar();
   $cluster[] = "Cluster ".$lc['cluster'];
+  $cekid[] = $lc['id'];
   $count_cluster[] = $cls;
   $c1++;
 endforeach;
@@ -32,6 +35,7 @@ foreach($list_count_cluster as $v => $vl):
   // SUM(IF(sentiment='Positive' AND (review_last_update_date_and_time BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS c_sent_positif
   $list_value_cluster = $connection->createCommand("SELECT a.*,b.*, SUM(IF(a.login='$user->id' AND a.kmeans_type='$t' AND a.iterasi='$max_iterasi' AND a.cluster='$vl[cluster]',(b.reg1 + b.reg2 + b.reg3 + b.reg4 + b.reg5 + b.reg6 + b.reg7),0)) AS jlh_reg FROM list_centroid AS a INNER JOIN count_symptom AS b ON a.count_symptom=b.id WHERE a.count_symptom=b.id AND a.login='$user->id' AND a.kmeans_type='$t' AND a.iterasi='$max_iterasi' AND a.cluster='$vl[cluster]'")->queryOne();
   $cluster2[] = "Cluster ".$vl['cluster'];
+  $cekid2[] = $vl['id'];
   $sum_value[] = $list_value_cluster['jlh_reg'];
   $c2++;
 endforeach;
@@ -54,6 +58,7 @@ endforeach;
 	$data_count = [
 	  <?php for($i=0;$i<$c1;$i++){?>
 	    {
+	      cekid: '<?=$cekid[$i]?>',
 	      cluster: '<?=$cluster[$i]?>',
 	      count_cluster: '<?=$count_cluster[$i]?>',
 	    },
@@ -63,6 +68,7 @@ endforeach;
 	$data_sum = [
 	  <?php for($i=0;$i<$c2;$i++){?>
 	    {
+	      cekid2: '<?=$cekid2[$i]?>',
 	      cluster2: '<?=$cluster2[$i]?>',
 	      sum_value: '<?=$sum_value[$i]?>',
 	    },
@@ -82,6 +88,8 @@ endforeach;
     barColors: function (row, series, type) {
         return $katColors[row.x];
     },
+  }).on('click', function (i, row) {  
+    displayData(i, row);
   });
   
 	Morris.Bar({
@@ -98,5 +106,16 @@ endforeach;
     barColors: function (row, series, type) {
         return $katColors[row.x];
     },
-	});
+	}).on('click', function (i, row) {  
+    displayData2(i, row);
+  });
+
+  function displayData(i, row){
+    // alert (row.count_cluster);
+    window.open('display-data?id='+row.cekid+'&type=count','_blank');
+  }
+  function displayData2(i, row){
+    // alert (row.count_cluster);
+    window.open('display-data?id='+row.cekid2+'&type=symptom','_blank');
+  }
 </script>
