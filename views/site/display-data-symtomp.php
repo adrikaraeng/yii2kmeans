@@ -61,7 +61,6 @@ $this->title = Yii::t('app', 'Detail data');
             <th>#</th>
             <th>Tiket</th>
             <th>Internet</th>
-            <th>PSTN</th>
             <th>Speed</th>
             <th>Packet</th>
             <th>Regional</th>
@@ -101,7 +100,6 @@ $this->title = Yii::t('app', 'Detail data');
                 <td><?=$no++?></td>
                 <td><?=$cd['trouble_ticket']?></td>
                 <td><?=$cd['internet_number']?></td>
-                <td><?=$cd['pstn']?></td>
                 <td><?=$cd['speed']?></td>
                 <td><?=$cd['packet']?></td>
                 <td><?=$cd['tregional']?></td>
