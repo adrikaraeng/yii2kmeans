@@ -85,12 +85,14 @@ class SiteController extends Controller
       }elseif($type == 'symptom'){
         $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$data[kmeans_type]' ORDER BY id desc")->queryOne();
 
+        // if($data['kmeans_type'] == 'teknisi'):
         $cek_data = $connection->createCommand("SELECT *, e.regional as tregional, b.symptom AS tsymptom, MAX(d.iterasi) AS max_iterasi FROM cases AS a 
           LEFT JOIN symptom AS b ON b.id=a.symptomp
           LEFT JOIN regional AS e ON e.id=a.regional
           LEFT JOIN count_symptom AS c ON c.symptom=b.id AND c.kmeans_type='$data[kmeans_type]'
           LEFT JOIN list_centroid AS d ON d.count_symptom=c.id
           WHERE date(a.date_open)>='$cek_tgl[start_date]' AND date(a.date_open) <= '$cek_tgl[end_date]' AND d.cluster='$data[cluster]' AND d.kmeans_type='$data[kmeans_type]' AND d.iterasi='$data[iterasi]' AND a.amcrew <> '' GROUP BY a.amcrew, b.id")->queryAll();
+        // endif;
         return $this->render('/site/display-data-symtomp',[
           'cek_data' => $cek_data,
           'data' => $data,

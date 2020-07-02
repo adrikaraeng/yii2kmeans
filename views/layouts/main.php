@@ -39,21 +39,21 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            // ['label' => 'About', 'url' => ['/site/about']],
+            ['label' => 'K-Means', 'url' => ['/site/cases-symthomp']],
             // ['label' => 'Contact', 'url' => ['/site/contact']],
-            [
-                'label' => 'K-Means',
-                'url' => ['/site/kmeans'],
-                // 'options' => ['onclick'=>""],
-                // 'linkOptions'=>['class'=>'link-dropdown'],
-                'encodeLabels' => false,
-                'items' => [
-                    ['label' => 'Cases Sympthomp','url' => ['/site/cases-symthomp'],
-                    'linkOptions'=>['class'=>'link-dropdown']],
-                    ['label' => 'Technisian','url' => ['/site/technisian'],
-                    'linkOptions'=>['class'=>'link-dropdown']],
-                ],
-            ],
+            // [
+            //     'label' => 'K-Means',
+            //     'url' => ['/site/kmeans'],
+            //     // 'options' => ['onclick'=>""],
+            //     // 'linkOptions'=>['class'=>'link-dropdown'],
+            //     'encodeLabels' => false,
+            //     'items' => [
+            //         ['label' => 'Cases Sympthomp','url' => ['/site/cases-symthomp'],
+            //         'linkOptions'=>['class'=>'link-dropdown']],
+            //         ['label' => 'Technisian','url' => ['/site/technisian'],
+            //         'linkOptions'=>['class'=>'link-dropdown']],
+            //     ],
+            // ],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
