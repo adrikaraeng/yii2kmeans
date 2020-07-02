@@ -33,7 +33,8 @@ endforeach;
 
 foreach($list_count_cluster as $v => $vl):
   // SUM(IF(sentiment='Positive' AND (review_last_update_date_and_time BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS c_sent_positif
-  $list_value_cluster = $connection->createCommand("SELECT a.*,b.*, SUM(IF(a.login='$user->id' AND a.kmeans_type='$t' AND a.iterasi='$max_iterasi' AND a.cluster='$vl[cluster]',(b.reg1 + b.reg2 + b.reg3 + b.reg4 + b.reg5 + b.reg6 + b.reg7),0)) AS jlh_reg FROM list_centroid AS a INNER JOIN count_symptom AS b ON a.count_symptom=b.id WHERE a.count_symptom=b.id AND a.login='$user->id' AND a.kmeans_type='$t' AND a.iterasi='$max_iterasi' AND a.cluster='$vl[cluster]'")->queryOne();
+  $list_value_cluster = $connection->createCommand("SELECT a.*,b.*, SUM(IF(a.login='$user->id' AND a.kmeans_type='$t' AND a.iterasi='$max_iterasi' AND a.cluster='$vl[cluster]',(b.reg1 + b.reg2 + b.reg3 + b.reg4 + b.reg5 + b.reg6 + b.reg7),0)) AS jlh_reg FROM list_centroid AS a
+  INNER JOIN count_symptom AS b ON a.count_symptom=b.id WHERE a.count_symptom=b.id AND a.login='$user->id' AND a.kmeans_type='$t' AND a.iterasi='$max_iterasi' AND a.cluster='$vl[cluster]'")->queryOne();
   $cluster2[] = "Cluster ".$vl['cluster'];
   $cekid2[] = $vl['id'];
   $sum_value[] = $list_value_cluster['jlh_reg'];
