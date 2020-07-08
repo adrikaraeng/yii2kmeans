@@ -12,6 +12,8 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->field($model, 'segment')->textInput() ?>
+
     <?= $form->field($model, 'symptom')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">

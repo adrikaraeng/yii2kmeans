@@ -24,11 +24,16 @@ class AppAsset extends AssetBundle
         'fontawesome/css/all.css',
         'fontawesome/css/brands.css',
         'fontawesome/css/fontawesome.css',
-        // 'morrisjs/morris.css',
+        'morrisjs/morris.css',
     ];
-    public $js = [
+    public $js  = [
         'morrisjs/morris.js',
+        // 'js/regional.js',
         'js/raphael-min.js',
+        'canvasjs-2.3.1/canvasjs.min.js',
+    ];
+    public $jsOptions = [
+        'position' => \yii\web\View::POS_HEAD
     ];
     public $depends = [
         'yii\web\YiiAsset',

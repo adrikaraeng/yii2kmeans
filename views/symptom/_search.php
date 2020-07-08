@@ -20,6 +20,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
+    <?= $form->field($model, 'segment') ?>
+
     <?= $form->field($model, 'symptom') ?>
 
     <div class="form-group">

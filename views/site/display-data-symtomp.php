@@ -50,11 +50,19 @@ $this->title = Yii::t('app', 'Detail data');
 </style>
 <div class="detail-data-list">
   <div class="detail-title" style="font-weight:bold;font-size:1.2em;text-align:center;">Detail Data Cluster <?=$data['cluster']?></div>
-    <div class="input-container" style="text-align:center;">
+    <div class="input-container" style="text-align:center;float:left;max-width:400px;width:100%;">
       <i class="fa fa-search icon"></i>
-      <input type="text" name="search" id="search" class="input-field" placeholder="Search data" style="max-width:400px;width:100%;">
+      <input type="text" name="search" id="search" class="input-field" style="width:300px;" placeholder="Search data">
     </div>
-
+    <div style="clear:right;text-align:right;">
+      <?= Html::a("<span class='btn btn-primary'>Show more analytics</span>", Url::toRoute(['site/show-more',
+          'id' => $data['id'],
+          'type' => $type
+        ]), [
+          'title' => Yii::t('app', 'Show more analytics'),
+        ]);
+      ?>
+    </div>
     <div class="table-reponsive">
       <table id="tb-analisis-cluster">
         <tr>
@@ -66,7 +74,8 @@ $this->title = Yii::t('app', 'Detail data');
             <th>Regional</th>
             <th>Witel</th>
             <th>Datel</th>
-            <th>Symptom Problem</th>
+            <th>Jlh</th>
+            <th>Symptom Problem [Segment]</th>
             <th>Amcrew</th>
         </tr>
         <?php $no=1;foreach($cek_data as $cdata => $cd):?>
@@ -78,22 +87,29 @@ $this->title = Yii::t('app', 'Detail data');
                     $witel = "-";
                 endif;    
 
-                if($cd['amcrew'] != NULL || $cd['amcrew'] != ''):
-                  $c_amcrew = $connection->createCommand("SELECT COUNT(a.amcrew) FROM cases AS a
-                  LEFT JOIN symptom AS b ON b.id=a.symptomp
-                  LEFT JOIN count_symptom AS c ON c.symptom=b.id AND c.kmeans_type='$cd[kmeans_type]'
-                  LEFT JOIN list_centroid AS d ON d.count_symptom=c.id AND d.iterasi='$cd[iterasi]'
-                  WHERE date(a.date_open)>='$start_date' AND date(a.date_open) <= '$end_date' AND a.amcrew='$cd[amcrew]' AND d.cluster='$cd[cluster]' AND d.kmeans_type='$cd[kmeans_type]' AND a.amcrew <> '' GROUP BY b.id")->queryScalar();
-
-                  $data_simptomp = $connection->createCommand("SELECT *, b.symptom AS nama_symtomp FROM cases AS a
+                // if($cd['amcrew'] != NULL || $cd['amcrew'] != ''):
+                  $c_amcrew = $connection->createCommand("SELECT COUNT(*) FROM cases AS a
                   INNER JOIN symptom AS b ON b.id=a.symptomp
                   INNER JOIN count_symptom AS c ON c.symptom=b.id AND c.kmeans_type='$cd[kmeans_type]'
-                  INNER JOIN list_centroid AS d ON d.iterasi='$cd[iterasi]'
-                  WHERE a.amcrew <> '' AND date(a.date_open)>='$start_date' AND date(a.date_open) <= '$end_date' AND a.amcrew='$cd[amcrew]' AND d.cluster='$cd[cluster]' AND d.kmeans_type='$cd[kmeans_type]'
-                  GROUP BY b.id")->queryAll();
-                else:
-                  $c_amcrew = '';
-                endif;
+                  INNER JOIN list_centroid AS d ON d.count_symptom=c.id AND d.iterasi='$cd[iterasi]'
+                  WHERE date(a.date_open)>='$start_date' AND date(a.date_open) <= '$end_date' AND a.amcrew='$cd[amcrew]' AND d.cluster='$cd[cluster]' AND a.symptomp='$cd[symptomp]' AND d.kmeans_type='$cd[kmeans_type]'")->queryScalar();
+
+                  // $data_simptomp = $connection->createCommand("SELECT *, b.symptom AS nama_symtomp FROM cases AS a
+                  // INNER JOIN symptom AS b ON b.id=a.symptomp
+                  // INNER JOIN count_symptom AS c ON c.symptom=b.id AND c.kmeans_type='$cd[kmeans_type]'
+                  // INNER JOIN list_centroid AS d ON d.iterasi='$cd[iterasi]'
+                  // WHERE date(a.date_open)>='$start_date' AND date(a.date_open) <= '$end_date' AND a.amcrew='$cd[amcrew]' AND d.cluster='$cd[cluster]' AND d.kmeans_type='$cd[kmeans_type]' AND a.symptomp=c.symptom
+                  // GROUP BY a.amcrew, b.id")->queryAll();
+                  
+                  $data_simptomp = $connection->createCommand("SELECT *, b.symptom AS nama_symtomp, a.regional AS d_regional, e.segment AS e_segment  FROM cases AS a
+                  INNER JOIN symptom AS b ON b.id=a.symptomp
+                  LEFT JOIN segment AS e ON e.id=a.segment
+                  INNER JOIN count_symptom AS c ON c.symptom=b.id
+                  INNER JOIN list_centroid AS d ON d.count_symptom=c.id AND d.iterasi='$cd[iterasi]'
+                  WHERE date(a.date_open)>='$start_date' AND date(a.date_open) <= '$end_date' AND a.amcrew='$cd[amcrew]' AND d.cluster='$cd[cluster]' AND c.symptom='$cd[b_simptom]'")->queryAll();
+                // else:
+                //   $c_amcrew = '';
+                // endif;
 
             ?>
             <tr id="data-search">
@@ -105,13 +121,14 @@ $this->title = Yii::t('app', 'Detail data');
                 <td><?=$cd['tregional']?></td>
                 <td><?=$witel?></td>
                 <td><?=$cd['datel']?></td>
+                <td><?=$c_amcrew?></td>
                 <td>
                   <ul type="1">
                     <?php
                       if($data_simptomp){
                         foreach($data_simptomp as $ds => $s):
                     ?>
-                          <li><?=$s['nama_symtomp']?></li>
+                          <li><?=$s['nama_symtomp']." [".$s['e_segment']."]"?></li>
                     <?php 
                       endforeach;
                       }

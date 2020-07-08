@@ -18,7 +18,7 @@ class CasesSearch extends Cases
     {
         return [
             [['id', 'login'], 'integer'],
-            [['date_open', 'symptomp', 'regional', 'witel', 'trouble_ticket', 'ncli', 'internet_number', 'pstn', 'datel', 'speed', 'workzone_amcrew', 'amcrew', 'packet', 'status', 'date_closed'], 'safe'],
+            [['date_open', 'symptomp', 'regional', 'witel', 'trouble_ticket', 'ncli', 'internet_number', 'pstn', 'datel', 'speed', 'workzone_amcrew', 'amcrew', 'packet', 'status', 'date_closed', 'segment'], 'safe'],
         ];
     }
 
@@ -59,6 +59,7 @@ class CasesSearch extends Cases
         $query->joinWith('regional0');
         $query->joinWith('witel0');
         $query->joinWith('symptomp0');
+        $query->joinWith('segment0');
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
@@ -79,6 +80,7 @@ class CasesSearch extends Cases
             ->andFilterWhere(['like', 'regional.regional', $this->regional])
             ->orFilterWhere(['like', 'witel.nama_witel', $this->regional])
             ->andFilterWhere(['like', 'symptom.symptom', $this->symptomp])
+            ->andFilterWhere(['like', 'segment.segment', $this->segment])
             ->andFilterWhere(['like', 'workzone_amcrew', $this->workzone_amcrew])
             ->andFilterWhere(['like', 'amcrew', $this->amcrew])
             ->andFilterWhere(['like', 'packet', $this->packet])

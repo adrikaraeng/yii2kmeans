@@ -7,6 +7,7 @@ use yii\widgets\ActiveForm;
 
 $this->title = Yii::t('app', 'Cases');
 // $this->params['breadcrumbs'][] = $this->title;
+$connection=\Yii::$app->db;
 ?>
 <div class="cases-index">
     <div style="border: 0.5px solid #000;padding:6px;">
@@ -38,12 +39,26 @@ $this->title = Yii::t('app', 'Cases');
                 'attribute' => 'symptomp',
                 'format' => 'raw',
                 'value' => function($model){
-                    return $model->symptomp0->symptom;
+                    if($model->symptomp != NULL && $model->symptomp != ''):
+                        return $model->symptomp0->symptom;
+                    else:
+                        return '';
+                    endif;
+                }
+            ],
+            [
+                'attribute' => 'segment',
+                'format' => 'raw',
+                'value' => function($model){
+                    if($model->segment != NULL && $model->segment != ''):
+                        return $model->segment0->segment;
+                    else:
+                        return '';
+                    endif;
                 }
             ],
             // 'ncli',
             'internet_number',
-            'pstn',
             [
                 'attribute' => 'regional',
                 'contentOptions' => ['style'=>"text-align:center;"],

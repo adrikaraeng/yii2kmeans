@@ -23,6 +23,8 @@ use app\models\Centroid;
 use app\models\CentroidSearch;
 use app\models\ListCentroid;
 use app\models\ListcentroidSearch;
+use app\models\Segment;
+use app\models\SegmentSearch;
 
 class SiteController extends Controller
 {
@@ -68,9 +70,31 @@ class SiteController extends Controller
         ];
     }
 
+    public function actionShowMore($id, $type)
+    {
+      $connection = \Yii::$app->db;
+      if (Yii::$app->user->isGuest) {
+          Yii::$app->user->logout();
+          return $this->goHome();
+      }
+      $data = $connection->createCommand("SELECT * FROM list_centroid WHERE id='$id' GROUP BY iterasi ORDER BY iterasi DESC")->queryOne();
+      $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$data[kmeans_type]' ORDER BY id DESC")->queryOne();
+
+      return $this->render('/site/show-more',[
+        'data' => $data,
+        'type' => $type,
+        'start_date' => $cek_tgl['start_date'],
+        'end_date' => $cek_tgl['end_date'],
+      ]);
+    }
+
     public function actionDisplayData($id, $type)
     {
       $connection = \Yii::$app->db;
+      if (Yii::$app->user->isGuest) {
+          Yii::$app->user->logout();
+          return $this->goHome();
+      }
       $data = $connection->createCommand("SELECT * FROM list_centroid WHERE id='$id' GROUP BY iterasi ORDER BY iterasi DESC")->queryOne();
 
       if($type=='count'){
@@ -83,19 +107,19 @@ class SiteController extends Controller
           'data' => $data
         ]);
       }elseif($type == 'symptom'){
-        $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$data[kmeans_type]' ORDER BY id desc")->queryOne();
-
+        $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$data[kmeans_type]' ORDER BY id DESC")->queryOne();
         // if($data['kmeans_type'] == 'teknisi'):
-        $cek_data = $connection->createCommand("SELECT *, e.regional as tregional, b.symptom AS tsymptom, MAX(d.iterasi) AS max_iterasi FROM cases AS a 
-          LEFT JOIN symptom AS b ON b.id=a.symptomp
-          LEFT JOIN regional AS e ON e.id=a.regional
-          LEFT JOIN count_symptom AS c ON c.symptom=b.id AND c.kmeans_type='$data[kmeans_type]'
-          LEFT JOIN list_centroid AS d ON d.count_symptom=c.id
-          WHERE date(a.date_open)>='$cek_tgl[start_date]' AND date(a.date_open) <= '$cek_tgl[end_date]' AND d.cluster='$data[cluster]' AND d.kmeans_type='$data[kmeans_type]' AND d.iterasi='$data[iterasi]' AND a.amcrew <> '' GROUP BY a.amcrew, b.id")->queryAll();
+        $cek_data = $connection->createCommand("SELECT *, e.regional as tregional, b.symptom AS tsymptom, MAX(d.iterasi) AS max_iterasi, b.id AS b_simptom, a.regional AS a_regional, a.witel AS a_witel, a.datel AS a_datel, a.amcrew AS a_amcrew FROM cases AS a 
+          INNER JOIN symptom AS b ON b.id=a.symptomp
+          INNER JOIN regional AS e ON e.id=a.regional
+          INNER JOIN count_symptom AS c ON c.symptom=b.id AND c.kmeans_type='$data[kmeans_type]'
+          INNER JOIN list_centroid AS d ON d.count_symptom=c.id
+          WHERE date(a.date_open)>='$cek_tgl[start_date]' AND date(a.date_open) <= '$cek_tgl[end_date]' AND d.cluster='$data[cluster]' AND d.kmeans_type='$data[kmeans_type]' AND d.iterasi='$data[iterasi]' GROUP BY a.amcrew, b.id")->queryAll();
         // endif;
         return $this->render('/site/display-data-symtomp',[
           'cek_data' => $cek_data,
           'data' => $data,
+          'type' => $type,
           'start_date' => $cek_tgl['start_date'],
           'end_date' => $cek_tgl['end_date'],
         ]);
@@ -137,13 +161,13 @@ class SiteController extends Controller
         $cek_data = $connection->createCommand("SELECT * FROM cases WHERE date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')")->queryAll();
         $ck_cluster = $connection->createCommand("SELECT 
           a.*,b.*,
-          SUM(IF(a.regional='1' AND a.amcrew <> '' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_1,
-          SUM(IF(a.regional='2' AND a.amcrew <> '' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_2,
-          SUM(IF(a.regional='3' AND a.amcrew <> '' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_3,
-          SUM(IF(a.regional='4' AND a.amcrew <> '' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_4,
-          SUM(IF(a.regional='5' AND a.amcrew <> '' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_5,
-          SUM(IF(a.regional='6' AND a.amcrew <> '' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_6,
-          SUM(IF(a.regional='7' AND a.amcrew <> '' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_7
+          SUM(IF(a.regional='1' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_1,
+          SUM(IF(a.regional='2' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_2,
+          SUM(IF(a.regional='3' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_3,
+          SUM(IF(a.regional='4' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_4,
+          SUM(IF(a.regional='5' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_5,
+          SUM(IF(a.regional='6' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_6,
+          SUM(IF(a.regional='7' AND (a.date_open BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS r_7
           FROM cases AS a 
           INNER JOIN symptom AS b ON b.id=a.symptomp
           GROUP BY a.symptomp
@@ -509,29 +533,34 @@ class SiteController extends Controller
                 $date_open = $worksheet->getCellByColumnAndRow(1, $row)->getValue(); // Mengambil nilai kolom date_open
                 $tiket = $worksheet->getCellByColumnAndRow(2, $row)->getValue(); // Mengambil nilai kolom trouble_ticket
                 $symptomp = $worksheet->getCellByColumnAndRow(3, $row)->getValue(); // Mengambil nilai kolom symptomp
-                $ncli = $worksheet->getCellByColumnAndRow(4, $row)->getValue(); // Mengambil nilai kolom ncli
-                $inet = $worksheet->getCellByColumnAndRow(5, $row)->getValue(); // Mengambil nilai kolom internet_number
-                $pstn = $worksheet->getCellByColumnAndRow(6, $row)->getValue(); // Mengambil nilai kolom pstn
-                $regional = $worksheet->getCellByColumnAndRow(7, $row)->getValue(); // Mengambil nilai kolom regional
-                $witel = $worksheet->getCellByColumnAndRow(8, $row)->getValue(); // Mengambil nilai kolom witel
-                $datel = $worksheet->getCellByColumnAndRow(9, $row)->getValue(); // Mengambil nilai kolom datel
-                $speed = $worksheet->getCellByColumnAndRow(10, $row)->getValue(); // Mengambil nilai kolom speed 
-                $workzone = $worksheet->getCellByColumnAndRow(11, $row)->getValue(); // Mengambil nilai kolom workzone amvrew
-                $amcrew = $worksheet->getCellByColumnAndRow(12, $row)->getValue(); // Mengambil nilai kolom amcrew
-                $paket = $worksheet->getCellByColumnAndRow(13, $row)->getValue(); // Mengambil nilai kolom packet
-                $status = $worksheet->getCellByColumnAndRow(14, $row)->getValue(); // Mengambil nilai kolom status
-                $date_closed = $worksheet->getCellByColumnAndRow(15, $row)->getValue(); // Mengambil nilai kolom date_closed
+                $segment = $worksheet->getCellByColumnAndRow(4, $row)->getValue(); // Mengambil nilai kolom segment
+                $ncli = $worksheet->getCellByColumnAndRow(5, $row)->getValue(); // Mengambil nilai kolom ncli
+                $inet = $worksheet->getCellByColumnAndRow(6, $row)->getValue(); // Mengambil nilai kolom internet_number
+                $pstn = $worksheet->getCellByColumnAndRow(7, $row)->getValue(); // Mengambil nilai kolom pstn
+                $regional = $worksheet->getCellByColumnAndRow(8, $row)->getValue(); // Mengambil nilai kolom regional
+                $witel = $worksheet->getCellByColumnAndRow(9, $row)->getValue(); // Mengambil nilai kolom witel
+                $datel = $worksheet->getCellByColumnAndRow(10, $row)->getValue(); // Mengambil nilai kolom datel
+                $speed = $worksheet->getCellByColumnAndRow(11, $row)->getValue(); // Mengambil nilai kolom speed 
+                $workzone = $worksheet->getCellByColumnAndRow(12, $row)->getValue(); // Mengambil nilai kolom workzone amvrew
+                $amcrew = $worksheet->getCellByColumnAndRow(13, $row)->getValue(); // Mengambil nilai kolom amcrew
+                $paket = $worksheet->getCellByColumnAndRow(14, $row)->getValue(); // Mengambil nilai kolom packet
+                $status = $worksheet->getCellByColumnAndRow(15, $row)->getValue(); // Mengambil nilai kolom status
+                $date_closed = $worksheet->getCellByColumnAndRow(16, $row)->getValue(); // Mengambil nilai kolom date_closed
                 $login = $user->id; // Mengambil nilai login user $user
                 // print_r($tiket);
                 $cek_data = $connection->createCommand("SELECT * FROM cases WHERE trouble_ticket='$tiket'")->queryAll();
                 // $cek_data_null = $connection->createCommand("SELECT COUNT(*) FROM cases WHERE id IS NULL")->queryAll();
                 // print_r('test');
                 if(!$cek_data){
-                    print_r('test');
+                    // print_r('test');
                     $cek_symtomp = $connection->createCommand("SELECT * FROM symptom WHERE symptom LIKE '%$symptomp%'")->queryOne();
+                    $cek_segment = $connection->createCommand("SELECT * FROM segment WHERE segment LIKE '%$segment%'")->queryOne();
                     $cek_witel = $connection->createCommand("SELECT * FROM witel WHERE nama_witel LIKE '%$witel%'")->queryOne();
                     $cek_reg = $connection->createCommand("SELECT * FROM regional WHERE regional LIKE '%$regional%'")->queryOne();
 
+                    if($cek_segment['id'] == NULL){
+                      $cek_segment['id'] = '';
+                    }
                     if($cek_symtomp['id'] == NULL){
                         $cek_symtomp['id'] = '';
                     }
@@ -543,7 +572,7 @@ class SiteController extends Controller
                     }
 
                     // print_r($cek_reg['id']."-".$cek_symtomp['id']."<br>");
-                    $insert_cases = $connection->createCommand("INSERT INTO cases (`date_open`,`trouble_ticket`,`symptomp`,`ncli`,`internet_number`,`pstn`,`regional`,`witel`,`datel`,`speed`,`workzone_amcrew`,`amcrew`,`packet`,`status`,`date_closed`,`login`) VALUES ('$date_open','$tiket','$cek_symtomp[id]','$ncli','$inet','$pstn','$cek_reg[id]','$cek_witel[id]','$datel','$speed','$workzone','$amcrew','$paket','$status','$date_closed','$login')")->execute();
+                    $insert_cases = $connection->createCommand("INSERT INTO cases (`date_open`,`trouble_ticket`,`symptomp`,`segment`,`ncli`,`internet_number`,`pstn`,`regional`,`witel`,`datel`,`speed`,`workzone_amcrew`,`amcrew`,`packet`,`status`,`date_closed`,`login`) VALUES ('$date_open','$tiket','$cek_symtomp[id]','$cek_segment[id]','$ncli','$inet','$pstn','$cek_reg[id]','$cek_witel[id]','$datel','$speed','$workzone','$amcrew','$paket','$status','$date_closed','$login')")->execute();
                 }
                 //naa disini baru isi dengan model ->save()
             }

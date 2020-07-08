@@ -55,7 +55,7 @@ $this->title = Yii::t('app', 'Analisis Cluster');
 <div class="centroid-index">
   <div id="next-centroid">
   </div>
-  <div class="firs-centroid">
+  <div class="first-centroid">
 
     <?php Pjax::begin(['id' => 'pjx-analisis-cluster', 'enablePushState' => false]); ?>
 

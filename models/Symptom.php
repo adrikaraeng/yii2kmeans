@@ -8,9 +8,11 @@ use Yii;
  * This is the model class for table "symptom".
  *
  * @property int $id
+ * @property int|null $segment
  * @property string|null $symptom
  *
- * @property Cases[] $cases
+ * @property CountSymptom[] $countSymptoms
+ * @property Segment $segment0
  */
 class Symptom extends \yii\db\ActiveRecord
 {
@@ -28,26 +30,31 @@ class Symptom extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['segment'], 'integer'],
             [['symptom'], 'string', 'max' => 150],
+            [['segment'], 'exist', 'skipOnError' => true, 'targetClass' => Segment::className(), 'targetAttribute' => ['segment' => 'id']],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'segment' => Yii::t('app', 'Segment'),
             'symptom' => Yii::t('app', 'Symptom'),
         ];
     }
 
-    /**
-     * Gets query for [[Cases]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
+    public function getCountSymptoms()
+    {
+        return $this->hasMany(CountSymptom::className(), ['symptom' => 'id']);
+    }
+    
+    public function getSegment0()
+    {
+        return $this->hasOne(Segment::className(), ['id' => 'segment']);
+    }
+
     public function getCases()
     {
         return $this->hasMany(Cases::className(), ['symptomp' => 'id']);

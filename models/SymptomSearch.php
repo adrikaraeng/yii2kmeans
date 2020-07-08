@@ -17,7 +17,7 @@ class SymptomSearch extends Symptom
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['id', 'segment'], 'integer'],
             [['symptom'], 'safe'],
         ];
     }
@@ -59,6 +59,7 @@ class SymptomSearch extends Symptom
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'segment' => $this->segment,
         ]);
 
         $query->andFilterWhere(['like', 'symptom', $this->symptom]);

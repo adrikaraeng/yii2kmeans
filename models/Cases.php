@@ -46,14 +46,14 @@ class Cases extends \yii\db\ActiveRecord
     {
         return [
             [['date_open', 'date_closed'], 'safe'],
-            [['symptomp', 'regional', 'witel', 'login'], 'integer'],
+            [['symptomp', 'segment', 'regional', 'witel', 'login'], 'integer'],
             [['packet', 'status'], 'string'],
             [['trouble_ticket', 'internet_number', 'speed'], 'string', 'max' => 15],
             [['ncli'], 'string', 'max' => 10],
             [['pstn'], 'string', 'max' => 14],
             [['datel', 'workzone_amcrew', 'amcrew'], 'string', 'max' => 200],
             [['regional'], 'exist', 'skipOnError' => true, 'targetClass' => Regional::className(), 'targetAttribute' => ['regional' => 'id']],
-            [['symptomp'], 'exist', 'skipOnError' => true, 'targetClass' => Symptom::className(), 'targetAttribute' => ['symptomp' => 'id']],
+            [['symptomp', 'segment'], 'exist', 'skipOnError' => true, 'targetClass' => Symptom::className(), 'targetAttribute' => ['symptomp' => 'id']],
             [['witel'], 'exist', 'skipOnError' => true, 'targetClass' => Witel::className(), 'targetAttribute' => ['witel' => 'id']],
         ];
     }
@@ -68,6 +68,7 @@ class Cases extends \yii\db\ActiveRecord
             'date_open' => Yii::t('app', 'Date Open'),
             'trouble_ticket' => Yii::t('app', 'Trouble Ticket'),
             'symptomp' => Yii::t('app', 'Symptomp'),
+            'segment' => Yii::t('app', 'Segment'),
             'ncli' => Yii::t('app', 'Ncli'),
             'internet_number' => Yii::t('app', 'Internet Number'),
             'pstn' => Yii::t('app', 'Pstn'),
@@ -104,11 +105,11 @@ class Cases extends \yii\db\ActiveRecord
         return $this->hasOne(Symptom::className(), ['id' => 'symptomp']);
     }
 
-    /**
-     * Gets query for [[Witel0]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
+    public function getSegment0()
+    {
+        return $this->hasOne(Segment::className(), ['id' => 'segment']);
+    }
+
     public function getWitel0()
     {
         return $this->hasOne(Witel::className(), ['id' => 'witel']);
