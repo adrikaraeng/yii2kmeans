@@ -123,20 +123,22 @@
         ]);
     ?>
     </div>
-    <div class="row" style="padding:2px;">
-        <div class="col-lg-6" style="border:0.5px solid #cfcdcd;border-radius:5px;">
-            <div style="text-align:center;font-weight:bold;">Symptom by Regional</div>
-            <div id="reg0" style="height: 300px;background-color:transparent;"></div>
-        </div>
-        <div class="col-lg-6" style="border:0.5px solid #cfcdcd;border-radius:5px;">
-            <div style="text-align:center;font-weight:bold;">By Segment</div>
-            <div id="seg0" style="height: 300px;background-color:transparent;"></div>
-        </div>
-    </div>
     <div class="row">
-        <div class="col-lg-6" style="border:0.5px solid #cfcdcd;border-radius:5px;">
-            <div style="text-align:center;font-weight:bold;">Service Status</div>
-            <div id="serv0" style="height: 300px;background-color:transparent;"></div>
+        <div class="col-lg-6">
+            <div class="col-lg-12" style="border-bottom:0.5px solid #cfcdcd;">
+                <div style="text-align:center;font-weight:bold;">Symptom by Regional</div>
+                <div id="reg0" style="height: 200px;background-color:transparent;"></div>
+            </div>
+            <div class="col-lg-12">
+                <div style="text-align:center;font-weight:bold;">Service Status</div>
+                <div id="serv0" style="height: 300px;background-color:transparent;"></div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="col-lg-12" style="border-left:0.5px solid #cfcdcd;">
+                <div style="text-align:center;font-weight:bold;">By Segment</div>
+                <div id="seg0" style="height: 500px;background-color:transparent;"></div>
+            </div>
         </div>
     </div>
 </div>

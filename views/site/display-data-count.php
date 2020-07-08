@@ -46,7 +46,7 @@ $this->title = Yii::t('app', 'Detail data');
             <?php $no=1;foreach($cek_data as $cdata => $cd):?>
                 <tr>
                     <td><?=$no++?></td>
-                    <td><?=$cd['symptom']?></td>
+                    <td><?=$cd['b_simptom']?></td>
                 </tr>
             <?php endforeach;?>
         </tbody>

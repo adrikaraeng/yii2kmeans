@@ -98,10 +98,20 @@ class SiteController extends Controller
       $data = $connection->createCommand("SELECT * FROM list_centroid WHERE id='$id' GROUP BY iterasi ORDER BY iterasi DESC")->queryOne();
 
       if($type=='count'){
-        $cek_data = $connection->createCommand("SELECT * FROM list_centroid as a
-        INNER JOIN count_symptom as b ON b.id=a.count_symptom
-        INNER JOIN symptom as c ON c.id=b.symptom
-        WHERE a.kmeans_type='$data[kmeans_type]' AND a.cluster='$data[cluster]' AND b.kmeans_type='$data[kmeans_type]' GROUP BY c.id")->queryAll();
+        $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$data[kmeans_type]' ORDER BY id DESC")->queryOne();
+
+        // $cek_data = $connection->createCommand("SELECT * FROM list_centroid as a
+        // INNER JOIN count_symptom as b ON b.id=a.count_symptom
+        // INNER JOIN symptom as c ON c.id=b.symptom
+        // WHERE a.kmeans_type='$data[kmeans_type]' AND a.cluster='$data[cluster]' AND b.kmeans_type='$data[kmeans_type]' GROUP BY c.id")->queryAll();
+
+        $cek_data = $connection->createCommand("SELECT *, e.regional as tregional, b.symptom AS tsymptom, MAX(d.iterasi) AS max_iterasi, b.symptom AS b_simptom, a.regional AS a_regional, a.witel AS a_witel, a.datel AS a_datel, a.amcrew AS a_amcrew FROM cases AS a 
+          INNER JOIN symptom AS b ON b.id=a.symptomp
+          INNER JOIN regional AS e ON e.id=a.regional
+          INNER JOIN count_symptom AS c ON c.symptom=b.id AND c.kmeans_type='$data[kmeans_type]'
+          INNER JOIN list_centroid AS d ON d.count_symptom=c.id
+          WHERE date(a.date_open)>='$cek_tgl[start_date]' AND date(a.date_open) <= '$cek_tgl[end_date]' AND d.cluster='$data[cluster]' AND d.kmeans_type='$data[kmeans_type]' AND d.iterasi='$data[iterasi]' GROUP BY a.symptomp")->queryAll();
+
         return $this->render('/site/display-data-count', [
           'cek_data' => $cek_data,
           'data' => $data
