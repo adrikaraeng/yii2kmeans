@@ -17,7 +17,7 @@ class CasesSearch extends Cases
     public function rules()
     {
         return [
-            [['id', 'login'], 'integer'],
+            [['id', 'login', 'range_day_service'], 'integer'],
             [['date_open', 'symptomp', 'regional', 'witel', 'trouble_ticket', 'ncli', 'internet_number', 'pstn', 'datel', 'speed', 'workzone_amcrew', 'amcrew', 'packet', 'status', 'date_closed', 'segment'], 'safe'],
         ];
     }
@@ -64,7 +64,7 @@ class CasesSearch extends Cases
         $query->andFilterWhere([
             'id' => $this->id,
             'date_open' => $this->date_open,
-            // 'symptomp' => $this->symptomp,
+            'range_day_service' => $this->range_day_service,
             // 'regional' => $this->regional,
             // 'witel' => $this->witel,
             'date_closed' => $this->date_closed,

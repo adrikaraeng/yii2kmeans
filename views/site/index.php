@@ -8,6 +8,18 @@ use yii\widgets\ActiveForm;
 $this->title = Yii::t('app', 'Cases');
 // $this->params['breadcrumbs'][] = $this->title;
 $connection=\Yii::$app->db;
+
+$cek_date_close = $connection->createCommand("SELECT * FROM cases WHERE range_day_service IS NULL OR range_day_service = ''")->queryAll();
+$del_null_date = $connection->createCommand("DELETE FROM cases WHERE date_open IS NULL OR date_closed IS NULL OR date_open='' OR date_closed=''")->execute();
+
+foreach($cek_date_close as $c_dc => $row):
+    $date_old = date_create(date('Y-m-d', strtotime($row['date_open'])));
+    $date_new = date_create(date('Y-m-d', strtotime($row['date_closed'])));
+    $diff = date_diff($date_old, $date_new);
+
+    $update_row = $connection->createCommand("UPDATE cases SET range_day_service='$diff->d' WHERE range_day_service IS NULL AND id='$row[id]'")->execute();
+endforeach;
+
 ?>
 <div class="cases-index">
     <div style="border: 0.5px solid #000;padding:6px;">
@@ -72,8 +84,8 @@ $connection=\Yii::$app->db;
             //'workzone_amcrew',
             'amcrew',
             //'packet',
-            'status',
-            //'date_closed',
+            // 'status',
+            'date_closed',
             //'login',
 
             // ['class' => 'yii\grid\ActionColumn'],

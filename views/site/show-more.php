@@ -6,6 +6,57 @@
     $this->registerCssFile('@web/css/morris.css');
     $connection = \Yii::$app->db;
 
+    $sql_service_mudah = $connection->createCommand("SELECT COUNT(*)
+    FROM cases AS a
+    INNER JOIN segment AS b ON b.id=a.segment
+    INNER JOIN symptom AS c ON c.id=a.symptomp
+    INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
+    INNER JOIN list_centroid AS e ON e.count_symptom=d.id
+    WHERE  e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='0'
+    GROUP BY a.range_day_service
+    ")->queryScalar(); 
+
+    $sql_service_normal = $connection->createCommand("SELECT COUNT(*)
+    FROM cases AS a
+    INNER JOIN segment AS b ON b.id=a.segment
+    INNER JOIN symptom AS c ON c.id=a.symptomp
+    INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
+    INNER JOIN list_centroid AS e ON e.count_symptom=d.id
+    WHERE e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='1' OR e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='2'
+    ")->queryScalar(); 
+
+    $sql_service_sulit = $connection->createCommand("SELECT COUNT(*)
+    FROM cases AS a
+    INNER JOIN segment AS b ON b.id=a.segment
+    INNER JOIN symptom AS c ON c.id=a.symptomp
+    INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
+    INNER JOIN list_centroid AS e ON e.count_symptom=d.id
+    WHERE e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service>'2'
+    ")->queryScalar();  
+
+    $sql_service_all = $connection->createCommand("SELECT COUNT(*)
+    FROM cases AS a
+    INNER JOIN segment AS b ON b.id=a.segment
+    INNER JOIN symptom AS c ON c.id=a.symptomp
+    INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
+    INNER JOIN list_centroid AS e ON e.count_symptom=d.id
+    WHERE e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service IS NOT NULL
+    ")->queryScalar(); 
+    
+    $sql_data_service = $connection->createCommand("SELECT *,
+    SUM(IF(e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='0',1,0)) AS c_mudah,
+    SUM(IF(e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='1' OR e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='2',1,0)) AS c_normal,
+    SUM(IF(e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service > '2',1,0)) AS c_sulit,
+    SUM(IF(e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service IS NOT NULL,1,0)) AS c_all
+    FROM cases AS a
+    INNER JOIN segment AS b ON b.id=a.segment
+    INNER JOIN symptom AS c ON c.id=a.symptomp
+    INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
+    INNER JOIN list_centroid AS e ON e.count_symptom=d.id
+    WHERE e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]'
+    GROUP BY a.range_day_service
+    ")->queryAll();
+
     $sql_data_regional = $connection->createCommand("SELECT *,
     SUM(IF(e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date',1,0)) AS c_regional, b.regional AS b_regional
     FROM cases AS a
@@ -28,10 +79,15 @@
     GROUP BY a.segment
     ")->queryAll();
 
+    $mudah = round(($sql_service_mudah / $sql_service_all)*100,2);
+    $normal =  round(($sql_service_normal / $sql_service_all)*100,2);
+    $sulit =  round(100-($mudah+$normal),2);
+    $all =  $mudah+$normal+$sulit;
+    
     $seg = [];
     $count_seg = [];
     $c2 = 0;
-    foreach($sql_data_segment as $sgt):
+    foreach($sql_data_segment as $sg => $sgt):
         $seg[] = $sgt['b_segment'];
         $count_seg[] = $sgt['c_segment'];
         $c2++;
@@ -50,6 +106,13 @@
 ?>
 
 <div class="index-show-more">
+    <div id="service-mudah" style="display:none;"><?=$mudah?></div>
+    <div id="service-normal" style="display:none;"><?=$normal?></div>
+    <div id="service-sulit" style="display:none;"><?=$sulit?></div>
+    <div id="service-mudah-val" style="display:none;"><?=$sql_service_mudah?></div>
+    <div id="service-normal-val" style="display:none;"><?=$sql_service_normal?></div>
+    <div id="service-sulit-val" style="display:none;"><?=$sql_service_sulit?></div>
+
     <div style="text-align:center;text-transform:uppercase;font-weight:bold;">Cluster <?=$data['cluster']?></div>
     <div style="text-align:right;position:fixed;right:30px;">
     <?= Html::a("<span class='btn btn-danger'><i class='fa fa-arrow-circle-left'></i> Back</span>", Url::toRoute(['site/display-data',
@@ -60,14 +123,20 @@
         ]);
     ?>
     </div>
-    <div class="row">
-        <div class="col-lg-6">
+    <div class="row" style="padding:2px;">
+        <div class="col-lg-6" style="border:0.5px solid #cfcdcd;border-radius:5px;">
             <div style="text-align:center;font-weight:bold;">Symptom by Regional</div>
-            <div id="reg0" style="height: 500px;background-color:transparent;"></div>
+            <div id="reg0" style="height: 300px;background-color:transparent;"></div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6" style="border:0.5px solid #cfcdcd;border-radius:5px;">
             <div style="text-align:center;font-weight:bold;">By Segment</div>
-            <div id="seg0" style="height: 500px;background-color:transparent;"></div>
+            <div id="seg0" style="height: 300px;background-color:transparent;"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6" style="border:0.5px solid #cfcdcd;border-radius:5px;">
+            <div style="text-align:center;font-weight:bold;">Service Status</div>
+            <div id="serv0" style="height: 300px;background-color:transparent;"></div>
         </div>
     </div>
 </div>
@@ -110,6 +179,48 @@
     });
 
     window.onload = function() {
+        
+        var mudah = $('#service-mudah').text();
+        var normal = $('#service-normal').text();
+        var sulit = $('#service-sulit').text();
+
+        var vmudah = $('#service-mudah-val').text();
+        var vnormal = $('#service-normal-val').text();
+        var vsulit = $('#service-sulit-val').text();
+
+        // console.log(vmudah);
+        var service_chart = new CanvasJS.Chart("serv0", {
+            animationEnabled: true,
+            theme: "light2",
+            backgroundColor: "transparent",
+            title: {
+                text: ""
+            },
+            legend:{
+                fontSize: 11,
+                horizontalAlign: "right",
+                verticalAlign: "center",
+                fontColor: "#7f7f7f",
+                fontFamily: "Roboto"
+            },
+            data: [{
+                type: "pie",
+                showInLegend: true,
+                legendText: "{label}",
+                yValueFormatString: "##0'%'",
+                indexLabel: "{label} {y}",
+                dataPoints: [
+                    { y:mudah, label:"Mudah("+vmudah+")|", color:'green'},
+                    { y:normal, label:"Normal("+vnormal+")|", color:'#e79c01'},
+                    { y:sulit, label:"Sulit("+vsulit+")|", color:'red'}
+                ]
+            }]
+        });
+
+        service_chart.render();
+        // service_chart.getCredits().setEnabled(false);
+
+
         var chart = new CanvasJS.Chart("seg0", {
             animationEnabled: true,
             // backgroundColor: "transparent",

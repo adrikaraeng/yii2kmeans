@@ -14,6 +14,7 @@ $this->title = Yii::t('app', 'Detail data');
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
+    font-size: 0.84em;
   }
 
   #tb-analisis-cluster td, #tb-analisis-cluster th {
@@ -77,6 +78,7 @@ $this->title = Yii::t('app', 'Detail data');
             <th>Jlh</th>
             <th>Symptom Problem [Segment]</th>
             <th>Amcrew</th>
+            <th>Status Service</th>
         </tr>
         <?php $no=1;foreach($cek_data as $cdata => $cd):?>
             <?php
@@ -114,10 +116,62 @@ $this->title = Yii::t('app', 'Detail data');
             ?>
             <tr id="data-search">
                 <td><?=$no++?></td>
-                <td><?=$cd['trouble_ticket']?></td>
-                <td><?=$cd['internet_number']?></td>
-                <td><?=$cd['speed']?></td>
-                <td><?=$cd['packet']?></td>
+                <td>
+                    <?php
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                          <div><?=$s['trouble_ticket']?></div>
+                    <?php 
+                      endforeach;
+                      }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                        <?php if($s['internet_number'] == NULL || $s['internet_number'] == ''):?>
+                          <div>-</div>
+                        <?php else:?>
+                          <div><?=$s['internet_number']?></div>
+                        <?php endif;?>
+                    <?php 
+                      endforeach;
+                      }
+                    ?>
+                </td>
+                <td>
+                  <?php
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                      <?php if($s['speed'] == NULL || $s['speed'] == ''):?>
+                        <div>-</div>
+                      <?php else:?>
+                          <div><?=$s['speed']?></div>
+                      <?php endif;?>
+                    <?php 
+                      endforeach;
+                      }
+                    ?>
+                </td>
+                <td>
+                  <?php
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                      <?php if($s['packet'] == NULL || $s['packet'] == ''):?>
+                        <div>-</div>
+                      <?php else:?>
+                          <div><?=$s['packet']?></div>
+                      <?php endif;?>
+                    <?php 
+                      endforeach;
+                      }
+                    ?>
+                </td>
                 <td><?=$cd['tregional']?></td>
                 <td><?=$witel?></td>
                 <td><?=$cd['datel']?></td>
@@ -135,7 +189,40 @@ $this->title = Yii::t('app', 'Detail data');
                     ?>
                   </ul>
                 </td>
-                <td><?=$cd['amcrew']?></td>
+                <td>
+                  <?php
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                      <?php if($s['amcrew'] == NULL || $s['amcrew'] == ''):?>
+                        <div>-</div>
+                      <?php else:?>
+                          <div><?=$s['amcrew']?></div>
+                      <?php endif;?>
+                    <?php 
+                      endforeach;
+                      }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                        <?php if($s['range_day_service'] == NULL || $s['range_day_service'] == ''):?>
+                          <div>-</div>
+                        <?php elseif($s['range_day_service'] == '0'):?>
+                          <div><span class="label label-success">Mudah</span></div>
+                        <?php elseif($s['range_day_service'] == '1' || $s['range_day_service'] == '2'):?>
+                          <div><span class="label label-warning">Normal</span></div>
+                        <?php elseif($s['range_day_service'] > '2'):?>
+                          <div><span class="label label-danger">Sulit</span></div>
+                        <?php endif;?>
+                    <?php 
+                      endforeach;
+                      }
+                    ?>
+                </td>
             </tr>
         <?php endforeach;?>
       </table>
