@@ -209,7 +209,7 @@
                 type: "pie",
                 showInLegend: true,
                 legendText: "{label}",
-                yValueFormatString: "##0'%'",
+                yValueFormatString: "##0.##'%'",
                 indexLabel: "{label} {y}",
                 dataPoints: [
                     { y:mudah, label:"Mudah("+vmudah+")|", color:'green'},

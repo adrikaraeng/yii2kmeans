@@ -114,8 +114,11 @@ class SiteController extends Controller
 
         return $this->render('/site/display-data-count', [
           'cek_data' => $cek_data,
-          'data' => $data
+          'data' => $data,
+          // 'start_date' => $cek_tgl['start_date'],
+          // 'end_date' => $cek_tgl['end_date'],
         ]);
+
       }elseif($type == 'symptom'){
         $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$data[kmeans_type]' ORDER BY id DESC")->queryOne();
         // if($data['kmeans_type'] == 'teknisi'):
