@@ -68,7 +68,7 @@ $this->title = Yii::t('app', 'Detail data');
       <table id="tb-analisis-cluster">
         <tr>
             <th>#</th>
-            <th>Tiket</th>
+            <th style="width:110px;">Tiket</th>
             <th>Internet</th>
             <th>Speed</th>
             <th>Packet</th>
@@ -76,11 +76,11 @@ $this->title = Yii::t('app', 'Detail data');
             <th>Witel</th>
             <th>Datel</th>
             <th>Jlh</th>
-            <th>Symptom Problem [Segment]</th>
+            <th style="width:250px;">Symptom Problem [Segment]</th>
             <th>Amcrew</th>
             <th>Status Service</th>
         </tr>
-        <?php $no=1;foreach($cek_data as $cdata => $cd):?>
+        <?php $nom=1;foreach($cek_data as $cdata => $cd):?>
             <?php
                 if($cd['witel'] != '' OR $cd['witel'] != NULL):
                     $data = $connection->createCommand("SELECT * FROM witel WHERE id='$cd[witel]'")->queryOne();
@@ -103,7 +103,8 @@ $this->title = Yii::t('app', 'Detail data');
                   // WHERE date(a.date_open)>='$start_date' AND date(a.date_open) <= '$end_date' AND a.amcrew='$cd[amcrew]' AND d.cluster='$cd[cluster]' AND d.kmeans_type='$cd[kmeans_type]' AND a.symptomp=c.symptom
                   // GROUP BY a.amcrew, b.id")->queryAll();
                   
-                  $data_simptomp = $connection->createCommand("SELECT *, b.symptom AS nama_symtomp, a.regional AS d_regional, e.segment AS e_segment  FROM cases AS a
+                  $data_simptomp = $connection->createCommand("SELECT *, b.symptom AS nama_symtomp, a.regional AS d_regional, e.segment AS e_segment, f.nama_witel AS f_witel FROM cases AS a
+                  LEFT JOIN witel AS f ON f.id=a.witel
                   INNER JOIN symptom AS b ON b.id=a.symptomp
                   LEFT JOIN segment AS e ON e.id=a.segment
                   INNER JOIN count_symptom AS c ON c.symptom=b.id
@@ -115,14 +116,16 @@ $this->title = Yii::t('app', 'Detail data');
 
             ?>
             <tr id="data-search">
-                <td><?=$no++?></td>
+                <td><?=$nom++?></td>
                 <td>
                     <?php
                       if($data_simptomp){
+                        $no = 1;
                         foreach($data_simptomp as $ds => $s):
                     ?>
-                          <div><?=$s['trouble_ticket']?></div>
+                          <div><?=$no.". <b>".$s['trouble_ticket']."</b>"?></div>
                     <?php 
+                      $no++;
                       endforeach;
                       }
                     ?>
@@ -159,22 +162,72 @@ $this->title = Yii::t('app', 'Detail data');
                 </td>
                 <td>
                   <?php
+                    $no = 1;
                       if($data_simptomp){
                         foreach($data_simptomp as $ds => $s):
                     ?>
                       <?php if($s['packet'] == NULL || $s['packet'] == ''):?>
-                        <div>-</div>
+                        <div><?=$no.". <b>-</b>"?></div>
                       <?php else:?>
-                          <div><?=$s['packet']?></div>
+                          <div><?=$no.". <b>".$s['packet']."</b>"?></div>
                       <?php endif;?>
+                    <?php 
+                      $no++;
+                      endforeach;
+                      }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                      $no =1;
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                        <?php if($s['d_regional'] == NULL || $s['d_regional'] == ''):?>
+                          <div><?=$no.". <b>-</b>"?></div>
+                        <?php else:?>
+                          <div><?=$no.". <b>".$s['d_regional']."</b>"?></div>
+                          <?php $no++;?>
+                        <?php endif;?>
                     <?php 
                       endforeach;
                       }
                     ?>
                 </td>
-                <td><?=$cd['tregional']?></td>
-                <td><?=$witel?></td>
-                <td><?=$cd['datel']?></td>
+                <td>
+                    <?php
+                      $no = 1;
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                        <?php if($s['f_witel'] == NULL || $s['f_witel'] == ''):?>
+                          <div><?=$no.". <b>-</b>"?></div>
+                        <?php else:?>
+                          <div><?=$no.". <b>".$s['f_witel']."</b>"?></div>
+                        <?php endif;?>
+                    <?php 
+                      $no++;
+                      endforeach;
+                      }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                      $no = 1;
+                      if($data_simptomp){
+                        foreach($data_simptomp as $ds => $s):
+                    ?>
+                      <?php if($s['datel'] == NULL || $s['datel'] == ''):?>
+                        <div><?=$no.". <b>-</b>"?></div>
+                      <?php else:?>
+                          <div><?=$no.". <b>".$s['datel']."</b>"?></div>
+                      <?php endif;?>
+                    <?php 
+                      $no++;
+                      endforeach;
+                      }
+                    ?>
+                </td>
                 <td><?=$c_amcrew?></td>
                 <td>
                   <ul type="1">
@@ -182,7 +235,7 @@ $this->title = Yii::t('app', 'Detail data');
                       if($data_simptomp){
                         foreach($data_simptomp as $ds => $s):
                     ?>
-                          <li><?=$s['nama_symtomp']." [".$s['e_segment']."]"?></li>
+                          <li><?=$s['nama_symtomp']." <b>[".$s['e_segment']."]</b>"?></li>
                     <?php 
                       endforeach;
                       }

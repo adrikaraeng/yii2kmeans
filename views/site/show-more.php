@@ -162,7 +162,7 @@
 	  <?php } ?>
     ];
 
-    var katColors = ['#f0910f', '#9c6372', '#656049', '#e91b53', '#ca001f', '#02c89b', '#ca00a7', '#fca570', '#61c505', '#035bc7', '#7901c9', '#d6e41f', '#60c1f0', '#f4d25b', '#c2eb65', '#94bc9a', '#cbba85', '#9ca2b4'];
+    var katColors = ['#f0910f', '#9c6372', '#656049', '#e91b53', '#035bc7', '#60c1f0', '#f4d25b', '#c2eb65', '#ca001f', '#02c89b', '#ca00a7', '#fca570', '#61c505', '#7901c9', '#d6e41f', '#94bc9a', '#cbba85', '#9ca2b4'];
 
     new Morris.Bar({
         element: 'reg0',
@@ -211,6 +211,8 @@
                 legendText: "{label}",
                 yValueFormatString: "##0.##'%'",
                 indexLabel: "{label} {y}",
+                // indexLabelPlacement: "inside",
+                indexLabelFontStyle: "bold",
                 dataPoints: [
                     { y:mudah, label:"Mudah("+vmudah+")|", color:'green'},
                     { y:normal, label:"Normal("+vnormal+")|", color:'#e79c01'},
@@ -220,8 +222,6 @@
         });
 
         service_chart.render();
-        // service_chart.getCredits().setEnabled(false);
-
 
         var chart = new CanvasJS.Chart("seg0", {
             animationEnabled: true,
