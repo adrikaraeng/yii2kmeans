@@ -17,8 +17,8 @@ class CasesSearch extends Cases
     public function rules()
     {
         return [
-            [['id', 'login', 'range_day_service'], 'integer'],
-            [['date_open', 'symptomp', 'regional', 'witel', 'trouble_ticket', 'ncli', 'internet_number', 'pstn', 'datel', 'speed', 'workzone_amcrew', 'amcrew', 'packet', 'status', 'date_closed', 'segment'], 'safe'],
+            [['id', 'login'], 'integer'],
+            [['date_open', 'symptomp', 'regional', 'witel', 'trouble_ticket', 'ncli', 'internet_number', 'range_day_service', 'pstn', 'datel', 'speed', 'workzone_amcrew', 'amcrew', 'packet', 'status', 'date_closed', 'segment'], 'safe'],
         ];
     }
 

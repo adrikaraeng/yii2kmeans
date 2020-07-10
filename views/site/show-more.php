@@ -58,7 +58,7 @@
     ")->queryAll();
 
     $sql_data_regional = $connection->createCommand("SELECT *,
-    SUM(IF(e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date',1,0)) AS c_regional, b.regional AS b_regional
+    SUM(IF(e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date',1,NULL)) AS c_regional, b.regional AS b_regional
     FROM cases AS a
     INNER JOIN regional AS b ON b.id=a.regional
     INNER JOIN symptom AS c ON c.id=a.symptomp

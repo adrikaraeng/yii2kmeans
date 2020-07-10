@@ -126,7 +126,7 @@ FROM cases AS a INNER JOIN symptom AS b ON b.id=a.symptomp GROUP BY a.symptomp O
             ],
             [
               'attribute' => 'reg1',
-              'contentOptions' => ['style'=>"vertical-align:middle;text-align:center;"],
+              'contentOptions' => ['style'=>"vertical-align:middle;text-align:center;"]
             ],
             [
               'attribute' => 'reg2',

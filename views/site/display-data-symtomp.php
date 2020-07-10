@@ -120,12 +120,10 @@ $this->title = Yii::t('app', 'Detail data');
                 <td>
                     <?php
                       if($data_simptomp){
-                        $no = 1;
                         foreach($data_simptomp as $ds => $s):
                     ?>
-                          <div><?=$no.". <b>".$s['trouble_ticket']."</b>"?></div>
+                          <div><?="<b>".$s['trouble_ticket']."</b>"?></div>
                     <?php 
-                      $no++;
                       endforeach;
                       }
                     ?>
@@ -162,32 +160,28 @@ $this->title = Yii::t('app', 'Detail data');
                 </td>
                 <td>
                   <?php
-                    $no = 1;
                       if($data_simptomp){
                         foreach($data_simptomp as $ds => $s):
                     ?>
                       <?php if($s['packet'] == NULL || $s['packet'] == ''):?>
-                        <div><?=$no.". <b>-</b>"?></div>
+                        <div><?="<b>-</b>"?></div>
                       <?php else:?>
-                          <div><?=$no.". <b>".$s['packet']."</b>"?></div>
+                          <div><?="<b>".$s['packet']."</b>"?></div>
                       <?php endif;?>
-                    <?php 
-                      $no++;
+                    <?php
                       endforeach;
                       }
                     ?>
                 </td>
                 <td>
                     <?php
-                      $no =1;
                       if($data_simptomp){
                         foreach($data_simptomp as $ds => $s):
                     ?>
                         <?php if($s['d_regional'] == NULL || $s['d_regional'] == ''):?>
-                          <div><?=$no.". <b>-</b>"?></div>
+                          <div><?="<b>-</b>"?></div>
                         <?php else:?>
-                          <div><?=$no.". <b>".$s['d_regional']."</b>"?></div>
-                          <?php $no++;?>
+                          <div><?="<b>".$s['d_regional']."</b>"?></div>
                         <?php endif;?>
                     <?php 
                       endforeach;

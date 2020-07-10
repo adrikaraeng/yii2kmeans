@@ -82,6 +82,7 @@ class Cases extends \yii\db\ActiveRecord
             'status' => Yii::t('app', 'Status'),
             'date_closed' => Yii::t('app', 'Date Closed'),
             'login' => Yii::t('app', 'Login'),
+            'range_day_service' => Yii::t('app', 'Status Service'),
         ];
     }
 
