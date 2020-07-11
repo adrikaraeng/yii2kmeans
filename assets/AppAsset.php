@@ -28,6 +28,7 @@ class AppAsset extends AssetBundle
     ];
     public $js  = [
         'morrisjs/morris.js',
+        'js/main.js',
         // 'js/regional.js',
         'js/raphael-min.js',
         'canvasjs-2.3.1/canvasjs.min.js',

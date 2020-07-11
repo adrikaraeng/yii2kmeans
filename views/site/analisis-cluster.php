@@ -95,7 +95,7 @@ $this->title = Yii::t('app', 'Analisis Cluster');
         <?php
           $cek_listcentroid = $connection->createCommand("SELECT * FROM list_centroid WHERE login='$row[login]' AND iterasi='$row[iterasi]' AND kmeans_type='$title'")->queryAll();
           
-          $in_centroid = $connection->createCommand("SELECT a.*,b.*,c.* FROM list_centroid AS a
+          $in_centroid = $connection->createCommand("SELECT a.*,b.*,c.*, b.kmeans_type AS b_kmeans_type, b.symptom AS b_symptom FROM list_centroid AS a
           INNER JOIN count_symptom AS b ON a.count_symptom=b.id
           INNER JOIN symptom AS c ON b.symptom=c.id
           WHERE a.login='$row[login]' AND a.iterasi='$row[iterasi]' AND a.kmeans_type='$title'
@@ -155,6 +155,7 @@ $this->title = Yii::t('app', 'Analisis Cluster');
                 <th style="text-align:center;">Regional 5</th>
                 <th style="text-align:center;">Regional 6</th>
                 <th style="text-align:center;">Regional 7</th>
+                <th style="text-align:center;">Label</th>
                 <th style="text-align:center;">Cluster</th>
               </tr>
             </thead>
@@ -170,6 +171,37 @@ $this->title = Yii::t('app', 'Analisis Cluster');
                   <td style="text-align:center;vertical-align:middle;"><?=$ic['reg5']?></td>
                   <td style="text-align:center;vertical-align:middle;"><?=$ic['reg6']?></td>
                   <td style="text-align:center;vertical-align:middle;"><?=$ic['reg7']?></td>
+                  <td style="text-align:center;vertical-align:middle;">
+                    <?php
+                      $date = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$ic[b_kmeans_type]' ORDER BY id DESC")->queryOne();
+                      $data = $connection->createCommand("SELECT *, count(a.range_day_service) as c_service FROM cases AS a 
+                        INNER JOIN symptom AS b ON b.id=a.symptomp
+                        INNER JOIN count_symptom AS c ON c.symptom=b.id
+                        INNER JOIN count_cluster AS d ON d.kmeans_type=c.kmeans_type
+                        WHERE date(a.date_open)>='$date[start_date]' AND date(a.date_open)<='$date[end_date]' AND a.symptomp='$ic[b_symptom]' AND a.regional IS NOT NULL AND c.symptom='$ic[b_symptom]' ORDER BY c_service DESC")->queryOne();
+                        
+                        // if($data['range_day_service'] == '0'):
+                        //   $text = "<span><span class='label label-success'>Mudah</span></span>";
+                        // elseif($data['range_day_service'] == '1' || $data['range_day_service'] == '2'):
+                        //   $text = "<span><span class='label label-warning'>Normal</span></span>";
+                        // elseif($data['range_day_service'] > '2'):
+                        //   $text = "<span><span class='label label-danger'>Sulit</span></span>";
+                        // else:
+                        //   $text = "<span><span class='label label-danger'>On Progress</span></span>";
+                        // endif;
+                        
+                        if($data['range_day_service'] == '0'):
+                          $text = "Mudah";
+                        elseif($data['range_day_service'] == '1' || $data['range_day_service'] == '2'):
+                          $text = "Normal";
+                        elseif($data['range_day_service'] > '2'):
+                          $text = "Sulit";
+                        else:
+                          $text = "On Progress";
+                        endif;
+                    ?>
+                    <?=$text?>
+                  </td>
                   <td style="text-align:center;vertical-align:middle;"><?=$ic['cluster']?></td>
                 </tr>
               <?php endforeach;?>

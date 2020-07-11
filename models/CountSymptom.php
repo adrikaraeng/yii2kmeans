@@ -24,9 +24,8 @@ use Yii;
  */
 class CountSymptom extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+    public $dominan;
+
     public static function tableName()
     {
         return 'count_symptom';
@@ -63,6 +62,7 @@ class CountSymptom extends \yii\db\ActiveRecord
             'reg5' => Yii::t('app', 'Reg 5'),
             'reg6' => Yii::t('app', 'Reg 6'),
             'reg7' => Yii::t('app', 'Reg 7'),
+            'dominan' => Yii::t('app', 'Label'),
         ];
     }
 

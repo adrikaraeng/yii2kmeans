@@ -18,7 +18,7 @@ class CountsymptomSearch extends CountSymptom
     {
         return [
             [['id', 'login', 'reg1', 'reg2', 'reg3', 'reg4', 'reg5', 'reg6', 'reg7'], 'integer'],
-            [['kmeans_type', 'symptom'], 'safe'],
+            [['kmeans_type', 'symptom', 'dominan'], 'safe'],
         ];
     }
 
