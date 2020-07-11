@@ -90,23 +90,23 @@ endforeach;
             // 'status',
             'date_closed',
             //'login',
-            [
-                'attribute' => 'range_day_service',
-                'format' => 'raw',
-                'filter' => false,
-                'value' => function($model){
-                    if($model->range_day_service=='0'):
-                        $text = "<div><span class='label label-success'>Mudah</span></div>";
-                    elseif($model->range_day_service=='1' || $model->range_day_service=='2'):
-                        $text = "<div><span class='label label-warning'>Normal</span></div>";
-                    elseif($model->range_day_service>'2'):
-                        $text = "<div><span class='label label-danger'>Sulit</span></div>";
-                    else:
-                        $text = "<div><span class='label label-warning'>On Progress</span></div>";
-                    endif;
-                    return $text;
-                }
-            ]
+            // [
+            //     'attribute' => 'range_day_service',
+            //     'format' => 'raw',
+            //     'filter' => false,
+            //     'value' => function($model){
+            //         if($model->range_day_service=='0'):
+            //             $text = "<div><span class='label label-success'>Mudah</span></div>";
+            //         elseif($model->range_day_service=='1' || $model->range_day_service=='2'):
+            //             $text = "<div><span class='label label-warning'>Normal</span></div>";
+            //         elseif($model->range_day_service>'2'):
+            //             $text = "<div><span class='label label-danger'>Sulit</span></div>";
+            //         else:
+            //             $text = "<div><span class='label label-warning'>On Progress</span></div>";
+            //         endif;
+            //         return $text;
+            //     }
+            // ]
 
             // ['class' => 'yii\grid\ActionColumn'],
         ],
