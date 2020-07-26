@@ -420,6 +420,11 @@
             title:{
                 text: ""
             },
+            legend: {
+                horizontalAlign: "left", // "center" , "right"
+                verticalAlign: "center",  // "top" , "bottom"
+                fontSize: 15
+            },
             axisX:{
                 // title: "timeline",
                 // valueFormatString: "#,##0.##",
