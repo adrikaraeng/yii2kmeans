@@ -32,6 +32,10 @@ class AppAsset extends AssetBundle
         // 'js/regional.js',
         'js/raphael-min.js',
         'canvasjs-2.3.1/canvasjs.min.js',
+        // 'highchart/code/highcharts.js',
+        // 'highchart/code/modules/exporting.js',
+        // 'highchart/code/hmodules/export-data.js',
+        // 'highchart/code/hmodules/accessibility.js',
     ];
     public $jsOptions = [
         'position' => \yii\web\View::POS_HEAD
