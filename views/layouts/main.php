@@ -26,7 +26,7 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
+<div class="wrap" style="margin-bottom:500px;">
     <?php
     NavBar::begin([
         'brandLabel' => "SCINS",
@@ -77,7 +77,6 @@ AppAsset::register($this);
         ]) ?>
         <?= Alert::widget() ?>
         <?= $content ?>
-
     </div>
 </div>
 

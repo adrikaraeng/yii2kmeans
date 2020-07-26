@@ -416,7 +416,7 @@
 
         var chart_scatter = new CanvasJS.Chart("chartContainer", {
             // animationEnabled: true,
-            height: 600,
+            height: 500,
             title:{
                 text: ""
             },
