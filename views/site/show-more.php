@@ -443,7 +443,7 @@
                 },
                 labelFontSize: 12,
                 titleFontSize: 15,
-                title: "Stack ticked",
+                title: "Queue tickets",
                 interval:50
             },
             data: [{
