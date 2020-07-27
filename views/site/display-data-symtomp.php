@@ -276,8 +276,10 @@ $this->title = Yii::t('app', 'Detail data');
     </div>
   </div>
 </div>
+
 <?php
 $this->registerJs("
+
   $('#search').keyup(function(){
     search_table($(this).val());
   });

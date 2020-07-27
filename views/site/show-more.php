@@ -13,16 +13,7 @@
     $this->registerCssFile('@web/css/morris.css');
     $connection = \Yii::$app->db;
 
-    
-    $sql_sv_all = $connection->createCommand("SELECT *
-    FROM cases AS a
-    INNER JOIN segment AS b ON b.id=a.segment
-    INNER JOIN symptom AS c ON c.id=a.symptomp
-    INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
-    INNER JOIN list_centroid AS e ON e.count_symptom=d.id
-    WHERE e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service IS NOT NULL GROUP BY a.id
-    ")->queryAll();
-    $sql_sv_mudah = $connection->createCommand("SELECT *,a.id AS a_id, c.symptom AS c_symtomp, a.regional AS a_regional, w.nama_witel AS w_witel
+    $sql_sv_mudah = $connection->createCommand("SELECT *,a.id AS a_id, c.symptom AS c_symtomp, a.regional AS a_regional, w.nama_witel AS w_witel, a.range_day_service AS rds
     FROM cases AS a
     INNER JOIN segment AS b ON b.id=a.segment
     LEFT JOIN witel AS w ON w.id=a.witel
@@ -31,7 +22,7 @@
     INNER JOIN list_centroid AS e ON e.count_symptom=d.id
     WHERE e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='0' GROUP BY a.id
     ")->queryAll();
-    $sql_sv_normal = $connection->createCommand("SELECT *,a.id AS a_id, c.symptom AS c_symtomp, a.regional AS a_regional, w.nama_witel AS w_witel
+    $sql_sv_normal = $connection->createCommand("SELECT *,a.id AS a_id, c.symptom AS c_symtomp, a.regional AS a_regional, w.nama_witel AS w_witel, a.range_day_service AS rds
     FROM cases AS a
     INNER JOIN segment AS b ON b.id=a.segment
     LEFT JOIN witel AS w ON w.id=a.witel
@@ -40,7 +31,7 @@
     INNER JOIN list_centroid AS e ON e.count_symptom=d.id
     WHERE e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='1' OR e.iterasi='$data[iterasi]' AND e.cluster='$data[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date' AND a.range_day_service='2' GROUP BY a.id
     ")->queryAll();
-    $sql_sv_sulit = $connection->createCommand("SELECT *,a.id AS a_id, c.symptom AS c_symtomp, a.regional AS a_regional, w.nama_witel AS w_witel
+    $sql_sv_sulit = $connection->createCommand("SELECT *,a.id AS a_id, c.symptom AS c_symtomp, a.regional AS a_regional, w.nama_witel AS w_witel, a.range_day_service AS rds
     FROM cases AS a
     INNER JOIN segment AS b ON b.id=a.segment
     LEFT JOIN witel AS w ON w.id=a.witel
@@ -172,16 +163,15 @@
     $c_sulit = 0;
 
     $srv_date_id_mudah = [];
-    foreach($sql_sv_all as $s_service_a => $s_a):
-        $tgl_a[] = date("d-m-Y", strtotime($s_a['date_open']));
-        $c_all++;
-    endforeach;
+
     foreach($sql_sv_mudah as $s_service_m => $s_m):
         // array_push($srv_date_id_mudah, array("x"=> date("Y-m-d", strtotime($s_m['date_open'])), "y"=> $s_m['a_id']));
         // $srv_date_id_mudah[] = join([date("Y-m-d", strtotime($s_m['date_open'])),$s_m['a_id']],',');
+        $rds = $s_m['rds'];
         if($s_m['amcrew'] == NULL || $s_m['amcrew'] == ''):
             $s_m['amcrew'] = "Closed by sistem";
         endif;
+
         $serv_s_mudah[] = $s_m['trouble_ticket'].'['.$s_m['c_symtomp'].']<br>Regional: '.$s_m['a_regional'].'/'.$s_m['w_witel'].'/'.$s_m['datel'].'<br>Handling: '.$s_m['amcrew'];
         $serv_s_mudah_id[] = $s_m['a_id'];
         $serv_s_mudah_rday[] = $s_m['range_day_service'];
@@ -194,6 +184,10 @@
     endforeach;
 
     foreach($sql_sv_normal as $s_service_n => $s_n):
+        if($s_n['amcrew'] == NULL || $s_n['amcrew'] == ''):
+            $s_n['amcrew'] = "Closed by sistem";
+        endif;
+        
         $serv_s_mudah[] = $s_n['trouble_ticket'].'['.$s_n['c_symtomp'].']<br>Regional: '.$s_n['a_regional'].'/'.$s_n['w_witel'].'/'.$s_n['datel'].'<br>Handling: '.$s_n['amcrew'];
         // $serv_s_normal[] = $s_n['trouble_ticket'];
         $serv_s_normal_id[] = $s_n['a_id'];
@@ -209,6 +203,9 @@
     endforeach;
     // echo "------------------------------------------";
     foreach($sql_sv_sulit as $s_service_s => $s_s):
+        if($s_s['amcrew'] == NULL || $s_s['amcrew'] == ''):
+            $s_s['amcrew'] = "Closed by sistem";
+        endif;
         $serv_s_mudah[] = $s_s['trouble_ticket'].'['.$s_s['c_symtomp'].']<br>Regional: '.$s_s['a_regional'].'/'.$s_s['w_witel'].'/'.$s_s['datel'].'<br>Handling: '.$s_s['amcrew'];
         // $serv_s_sulit[] = $s_s['trouble_ticket'];
         $serv_s_sulit_id[] = $s_s['a_id'];

@@ -38,10 +38,9 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'K-Means', 'url' => ['/site/cases-symthomp']],
-            ['label' => 'List Report', 'url' => ['/site/list-report']],
-            ['label' => 'Last Activity', 'url' => ['/site/analisis-cluster','title'=>'symtomp']],
+            ['label' => 'Home', 'url' => ['index']],
+            // ['label' => 'Reported', 'url' => ['cases-symthomp']],
+            // ['label' => 'Contact', 'url' => ['/site/contact']],
             // [
             //     'label' => 'K-Means',
             //     'url' => ['/site/kmeans'],
@@ -59,7 +58,7 @@ AppAsset::register($this);
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
                 '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
+                . Html::beginForm(['logout'], 'post')
                 . Html::submitButton(
                     'Logout (' . Yii::$app->user->identity->username . ')',
                     ['class' => 'btn btn-link logout']

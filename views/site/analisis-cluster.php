@@ -53,6 +53,20 @@ $this->title = Yii::t('app', 'Analisis Cluster');
   ?>
 
 <div class="centroid-index">
+  
+  <?php if (Yii::$app->session->hasFlash('success')): ?>
+    <div class="alert alert-success alert-dismissable" id="report-success" style="position:fixed;right:20px;display:none;">
+        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+        <?= Yii::$app->session->getFlash('success') ?>
+    </div>
+  <?php endif; ?>
+  <?php if (Yii::$app->session->hasFlash('error')): ?>
+    <div class="alert alert-danger alert-dismissable" id="report-error" style="position:fixed;right:20px;display:none;">
+        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+        <?= Yii::$app->session->getFlash('error') ?>
+    </div>
+  <?php endif; ?>
+  
   <div id="next-centroid">
   </div>
   <div class="first-centroid">
@@ -278,6 +292,14 @@ $this->title = Yii::t('app', 'Analisis Cluster');
           'style' => "position:fixed; right: 50px; top:100px;",
           'id' => 'modalButton',
           'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value'));"])?>
+      </div>
+      <div>
+        <?= Html::a("<span class='btn btn-warning' style='width:95px;'>Report</span>", Url::toRoute(['site/report','title'=>$title]), [
+            'style' => "position:fixed; right: 50px; top:150px;",
+            'data-confirm' => "Siap report data ?",
+            'title' => Yii::t('app', 'Show more analytics'),
+          ]);
+        ?>
       </div>
     <?php  } ?>
   </div>

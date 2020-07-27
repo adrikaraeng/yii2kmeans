@@ -35,6 +35,19 @@ FROM cases AS a INNER JOIN symptom AS b ON b.id=a.symptomp GROUP BY a.symptomp O
 ?>
 
 <div id="form-cluster-awal">
+  <?php if (Yii::$app->session->hasFlash('success')): ?>
+    <div class="alert alert-success alert-dismissable" id="report-success" style="position:fixed;right:20px;display:none;">
+        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+        <?= Yii::$app->session->getFlash('success') ?>
+    </div>
+  <?php endif; ?>
+  <?php if (Yii::$app->session->hasFlash('error')): ?>
+    <div class="alert alert-danger alert-dismissable" id="report-error" style="position:fixed;right:20px;display:none;">
+        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+        <?= Yii::$app->session->getFlash('error') ?>
+    </div>
+  <?php endif; ?>
+
   <?php $form = ActiveForm::begin([
     'id'=>'date-range',
     // 'options'=>['enctype'=>'multipart/form-data']

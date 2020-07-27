@@ -26,6 +26,12 @@ use app\models\ListCentroid;
 use app\models\ListcentroidSearch;
 use app\models\Segment;
 use app\models\SegmentSearch;
+use app\models\ReportCountCluster;
+use app\models\ReportCountClusterSearch;
+use app\models\ReportCountSymptom;
+use app\models\ReportData;
+use app\models\ReportListCentroid;
+use app\models\ReportCentroid;
 
 class SiteController extends Controller
 {
@@ -69,6 +75,167 @@ class SiteController extends Controller
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
+    }
+
+    public function actionViewReport($id)
+    {
+      $connection = \Yii::$app->db;
+      if (Yii::$app->user->isGuest) {
+          Yii::$app->user->logout();
+          return $this->goHome();
+      }
+      $user = User::findOne(Yii::$app->user->id);
+      $model = ReportCountCluster::findOne($id);
+
+      $data = $connection->createCommand("SELECT * FROM report_data WHERE date_open >= '$model->start_date' AND date_open <= '$model->end_date'")->queryAll();
+
+      return $this->render('view-report',[
+        'data' => $data,
+        'date_report' => $model->date_report,
+        'start_date' => $model->start_date,
+        'end_date' => $model->end_date
+      ]);
+    }
+    public function actionListReport()
+    {
+      $connection = \Yii::$app->db;
+      if (Yii::$app->user->isGuest) {
+          Yii::$app->user->logout();
+          return $this->goHome();
+      }
+      $user = User::findOne(Yii::$app->user->id);
+      
+      $searchModel = new ReportCountClusterSearch();
+      $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+      return $this->render('report-count-cluster', [
+          'searchModel' => $searchModel,
+          'dataProvider' => $dataProvider,
+      ]);
+    }
+
+    public function actionReport($title)
+    {
+      $connection = \Yii::$app->db;
+      if (Yii::$app->user->isGuest) {
+          Yii::$app->user->logout();
+          return $this->goHome();
+      }
+      
+      $user = User::findOne(Yii::$app->user->id);
+
+      $cek_tgl = $connection->createCommand("SELECT * FROM count_cluster ORDER BY id DESC")->queryOne();
+      // die();
+      $model_count_cluster = new ReportCountCluster;
+
+      $cek_if_av = $connection->createCommand("SELECT * FROM report_count_cluster WHERE start_date='$cek_tgl[start_date]' AND end_date='$cek_tgl[end_date]' AND jumlah_cluster='$cek_tgl[jumlah_cluster]'")->queryOne();
+
+      $cek_report_cases = $connection->createCommand("SELECT * FROM report_data WHERE DATE(date_open)>='$cek_tgl[start_date]' AND DATE(date_open)<='$cek_tgl[end_date]'")->queryAll();
+      
+      $cek_cases = $connection->createCommand("SELECT * FROM cases WHERE DATE(date_open)>='$cek_tgl[start_date]' AND DATE(date_open)<='$cek_tgl[end_date]'")->queryAll();
+      $cek_count_symptom = $connection->createCommand("SELECT * FROM count_symptom WHERE kmeans_type='$cek_tgl[kmeans_type]'")->queryAll();
+
+      $max_iterasi = $connection->createCommand("SELECT MAX(iterasi) FROM list_centroid")->queryScalar();
+      $cek_list_centroid = $connection->createCommand("SELECT * FROM list_centroid WHERE iterasi='$max_iterasi'")->queryAll();
+
+      // $max_centroid = $connection->createCommand("SELECT MAX(cluster) FROM centroid WHERE cluster='$cek_tgl[jumlah_cluster]'")->queryScalar();
+      $cek_report_centroid = $connection->createCommand("SELECT * FROM centroid WHERE login='$user->id'")->queryAll();
+
+      if($cek_if_av == NULL):
+        $model_count_cluster->login = $cek_tgl['login'];
+        $model_count_cluster->kmeans_type = $cek_tgl['kmeans_type'];
+        $model_count_cluster->start_date = $cek_tgl['start_date'];
+        $model_count_cluster->end_date = $cek_tgl['end_date'];
+        $model_count_cluster->jumlah_cluster = $cek_tgl['jumlah_cluster'];
+        $model_count_cluster->date_report = date('Y-m-d H:i:s');
+        $model_count_cluster->report_by = $user->id;
+        $model_count_cluster->save(false);
+
+        if($cek_report_cases == NULL):
+          foreach($cek_cases as $cek_case => $ccase):
+            $model_report_data = new ReportData;
+            $cekAv = $connection->createCommand("SELECT * FROM report_data WHERE date_open='$ccase[date_open]' AND trouble_ticket='$ccase[trouble_ticket]'")->queryOne();
+            if($cekAv == NULL):
+              $model_report_data->date_open = $ccase['date_open'];
+              $model_report_data->trouble_ticket = $ccase['trouble_ticket'];
+              $model_report_data->symptomp = $ccase['symptomp'];
+              $model_report_data->segment = $ccase['segment'];
+              $model_report_data->ncli = $ccase['ncli'];
+              $model_report_data->internet_number = $ccase['internet_number'];
+              $model_report_data->pstn = $ccase['pstn'];
+              $model_report_data->regional =$ccase['regional'];
+              $model_report_data->witel = $ccase['witel'];
+              $model_report_data->datel = $ccase['datel'];
+              $model_report_data->speed = $ccase['speed'];
+              $model_report_data->workzone_amcrew = $ccase['workzone_amcrew'];
+              $model_report_data->amcrew = $ccase['amcrew'];
+              $model_report_data->packet = $ccase['packet'];
+              $model_report_data->status = $ccase['status'];
+              $model_report_data->date_closed = $ccase['date_closed'];
+              $model_report_data->range_day_service = $ccase['range_day_service'];
+              $model_report_data->login = $ccase['login'];
+              $model_report_data->save(false);
+            endif;
+          endforeach;
+
+          foreach($cek_report_centroid as $c_centroid => $c_cd):
+            $model_report_centroid = new ReportCentroid;
+            $model_report_centroid->login = $c_cd['login'];
+            $model_report_centroid->kmeans_type = $c_cd['kmeans_type'];
+            $model_report_centroid->reg1 = $c_cd['reg1'];
+            $model_report_centroid->reg2 = $c_cd['reg2'];
+            $model_report_centroid->reg3 = $c_cd['reg3'];
+            $model_report_centroid->reg4 = $c_cd['reg4'];
+            $model_report_centroid->reg5 = $c_cd['reg5'];
+            $model_report_centroid->reg6 = $c_cd['reg6'];
+            $model_report_centroid->reg7 = $c_cd['reg7'];
+            $model_report_centroid->iterasi = $c_cd['iterasi'];
+            $model_report_centroid->cluster = $c_cd['cluster'];
+            $model_report_centroid->id_count_symptom = $c_cd['id_count_symptom'];
+            $model_report_centroid->date_report = $model_count_cluster->date_report;
+            $model_report_centroid->save(false);
+          endforeach;
+
+          foreach($cek_count_symptom as $c_counts => $ccs):
+            $model_count_symptom = new ReportCountSymptom;
+            $model_count_symptom->id = $ccs['id'];
+            $model_count_symptom->login = $ccs['login'];
+            $model_count_symptom->symptom = $ccs['symptom'];
+            $model_count_symptom->kmeans_type = $ccs['kmeans_type'];
+            $model_count_symptom->reg1 = $ccs['reg1'];
+            $model_count_symptom->reg2 = $ccs['reg2'];
+            $model_count_symptom->reg3 = $ccs['reg3'];
+            $model_count_symptom->reg4 = $ccs['reg4'];
+            $model_count_symptom->reg5 = $ccs['reg5'];
+            $model_count_symptom->reg6 = $ccs['reg6'];
+            $model_count_symptom->reg7 = $ccs['reg7'];
+            $model_count_symptom->date_report = $model_count_cluster->date_report;
+            $model_count_symptom->save(false);
+          endforeach;
+
+          foreach($cek_list_centroid as $c_listc => $clc):
+            $model_count_list_centroid = new ReportListCentroid;
+            $model_count_list_centroid->login = $clc['login'];
+            $model_count_list_centroid->kmeans_type = $clc['kmeans_type'];
+            $model_count_list_centroid->count_symptom = $clc['count_symptom'];
+            $model_count_list_centroid->iterasi = $clc['iterasi'];
+            $model_count_list_centroid->cluster = $clc['cluster'];
+            $model_count_list_centroid->c1 = $clc['c1'];
+            $model_count_list_centroid->c2 = $clc['c2'];
+            $model_count_list_centroid->c3 = $clc['c3'];
+            $model_count_list_centroid->c4 = $clc['c4'];
+            $model_count_list_centroid->c5 = $clc['c5'];
+            $model_count_list_centroid->date_report = $model_count_cluster->date_report;
+            $model_count_list_centroid->save(false);
+          endforeach;
+        endif;
+
+        Yii::$app->session->setFlash('success', "Success reported");
+        return $this->redirect(['analisis-cluster','title'=>$title]);
+      else:
+        Yii::$app->session->setFlash('error', "Data has been reported");
+        return $this->redirect(['analisis-cluster','title'=>$title]);
+      endif;
     }
 
     public function actionShowMore($id, $type)
@@ -362,7 +529,10 @@ class SiteController extends Controller
       $user = User::findOne(Yii::$app->user->id);
 
       $list_centroid = $connection->createCommand("SELECT * FROM centroid WHERE login='$user->id' AND kmeans_type='$title' GROUP BY iterasi ORDER BY iterasi DESC")->queryAll();
-      
+      if($list_centroid == NULL):
+        Yii::$app->session->setFlash('error', "No data found");
+        return $this->redirect(['cases-symthomp']);
+      endif;
       $searchModel = new CentroidSearch();
       $dataProvider = $searchModel->searchMax(Yii::$app->request->queryParams,$user->id,$title);
 
@@ -610,6 +780,10 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+          $level = Yii::$app->user->identity->level;
+          if($level == "manager"):
+            return $this->redirect(['/manager/index']);
+          endif;
             return $this->redirect(['index']);
         }
 
