@@ -10,6 +10,7 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('app', 'Report');
 ?>
+<p>Welcome back <b><?=$user->nama_lengkap?></b></p><p>status : <b><?=$user->level?></b></p>
 <div class="report-count-cluster-index">
 
     <?php Pjax::begin(); ?>

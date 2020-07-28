@@ -11,7 +11,7 @@
   $cluster2 = [];
   $cekid2 = [];
   $sum_value = [];
-  $c2 = 0;
+  $c_reg = 0;
   
   foreach($list_count_cluster as $v => $vl):
     // SUM(IF(sentiment='Positive' AND (review_last_update_date_and_time BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS c_sent_positif
@@ -24,8 +24,8 @@
     $cluster2[] = "Cluster ".$vl['cluster'];
     $cekid2[] = $vl['id'];
     $sum_value[] = $list_value_cluster['jlh_reg'];
-    // echo $vl['id']."<br>";
-    $c2++;
+    // echo $list_value_cluster['jlh_reg']."<br>";
+    $c_reg++;
   endforeach;
 ?>
 
@@ -124,9 +124,9 @@
 <div class="data-chart">
   <div class="row">
     <div class="col-lg-6">
-      <div class="col-lg-12" id="id_chart_cluster" style="width:555px;position:relative;border:0.5px solid #9b9b9b;padding:5px;">
-        <div style="text-align:center;font-weight:bold;">Total Symptom By Cluster</div>
-        <div id="sum_cluster" style="height:500px;background-color:transparent;"></div>
+      <div class="col-lg-12" id="id_chart_cluster" style="width:555px;position:relative;border:0.5px solid #9b9b9b;padding:5px;"> 
+          <div style="text-align:center;font-weight:bold;">Total Symptom By Cluster</div>
+          <div id="sum_cluster" style="height: 500px;background-color:transparent;"></div>
       </div>
     </div>
     <?php $id='1'; foreach($list_count_cluster as $lcount => $lcc):?>
@@ -259,7 +259,7 @@
   var $katColors = ['#ca001f', '#02c89b', '#ca00a7', '#fca570', '#61c505', '#035bc7', '#7901c9', '#f0910f', '#9c6372', '#656049', '#e91b53', '#d6e41f', '#60c1f0', '#f4d25b', '#c2eb65', '#94bc9a', '#cbba85', '#9ca2b4'];
   
 	$data_sum = [
-	  <?php for($i=0;$i<$c2;$i++){?>
+	  <?php for($i=0;$i<$c_reg;$i++){?>
 	    {
 	      cekid2: '<?=$cekid2[$i]?>',
 	      cluster2: '<?=$cluster2[$i]?>',

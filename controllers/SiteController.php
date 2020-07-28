@@ -766,7 +766,8 @@ class SiteController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'model' => $model
+            'model' => $model,
+            'user' => $user
         ]);
     }
 

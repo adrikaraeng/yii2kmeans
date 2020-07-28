@@ -22,6 +22,7 @@ endforeach;
 
 ?>
 <div class="cases-index">
+<p>Welcome back <b><?=$user->nama_lengkap?></b></p><p>status : <b><?=$user->level?></b></p>
     <div style="border: 0.5px solid #000;padding:6px;">
         <?php $form = ActiveForm::begin(['options'=>['enctype'=>'multipart/form-data']]); ?>
         <div style="float:left;">

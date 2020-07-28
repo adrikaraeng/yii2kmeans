@@ -64,13 +64,20 @@ class ManagerController extends Controller
 
     public function actionIndex()
     {
-        $this->layout = "main-manager";
+        $this->layout="main-manager";
+      $connection = \Yii::$app->db;
+      if (Yii::$app->user->isGuest) {
+          Yii::$app->user->logout();
+          return $this->goHome();
+      }
+      $user = User::findOne(Yii::$app->user->id);
         $searchModel = new ReportCountClusterSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'user' => $user
         ]);
     }
 

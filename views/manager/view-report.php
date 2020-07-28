@@ -11,7 +11,7 @@
   $cluster2 = [];
   $cekid2 = [];
   $sum_value = [];
-  $c2 = 0;
+  $c_reg = 0;
   
   foreach($list_count_cluster as $v => $vl):
     // SUM(IF(sentiment='Positive' AND (review_last_update_date_and_time BETWEEN '$start_date' AND LAST_DAY('$end_date')) ,1,0)) AS c_sent_positif
@@ -25,7 +25,7 @@
     $cekid2[] = $vl['id'];
     $sum_value[] = $list_value_cluster['jlh_reg'];
     // echo $vl['id']."<br>";
-    $c2++;
+    $c_reg++;
   endforeach;
 ?>
 
@@ -259,7 +259,7 @@
   var $katColors = ['#ca001f', '#02c89b', '#ca00a7', '#fca570', '#61c505', '#035bc7', '#7901c9', '#f0910f', '#9c6372', '#656049', '#e91b53', '#d6e41f', '#60c1f0', '#f4d25b', '#c2eb65', '#94bc9a', '#cbba85', '#9ca2b4'];
   
 	$data_sum = [
-	  <?php for($i=0;$i<$c2;$i++){?>
+	  <?php for($i=0;$i<$c_reg;$i++){?>
 	    {
 	      cekid2: '<?=$cekid2[$i]?>',
 	      cluster2: '<?=$cluster2[$i]?>',
