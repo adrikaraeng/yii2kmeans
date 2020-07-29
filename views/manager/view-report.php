@@ -124,9 +124,9 @@
 <div class="data-chart">
   <div class="row">
     <div class="col-lg-6">
-      <div class="col-lg-12" id="id_chart_cluster" style="width:555px;position:relative;border:0.5px solid #9b9b9b;padding:5px;">
+      <div class="col-lg-12" id="id_chart_cluster" style="width:100%;max-width:555px;position:relative;border:0.5px solid #9b9b9b;padding:5px;">
         <div style="text-align:center;font-weight:bold;">Total Symptom By Cluster</div>
-        <div id="sum_cluster" style="height:500px;background-color:transparent;"></div>
+        <div id="sum_cluster" style="height:100%;max-height:500px;background-color:transparent;"></div>
       </div>
     </div>
     <?php $id='1'; foreach($list_count_cluster as $lcount => $lcc):?>
