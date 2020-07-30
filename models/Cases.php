@@ -45,7 +45,7 @@ class Cases extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['date_open', 'date_closed', 'range_day_service'], 'safe'],
+            [['date_open', 'date_closed', 'range_day_service', 'val_uniqx', 'val_uniqy'], 'safe'],
             [['symptomp', 'segment', 'regional', 'witel', 'login', 'range_day_service'], 'integer'],
             [['packet', 'status'], 'string'],
             [['trouble_ticket', 'internet_number', 'speed'], 'string', 'max' => 15],

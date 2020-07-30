@@ -450,44 +450,44 @@ FROM cases AS a INNER JOIN symptom AS b ON b.id=a.symptomp GROUP BY a.symptomp O
               },
               'contentOptions' => ['style'=>"vertical-align:middle;text-align:center;"],
             ],
-            // [
-            //   'attribute' => 'dominan',
-            //   'format' => 'raw',
-            //   'value' => function($model) use ($connection){
-            //     $date = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$model->kmeans_type' ORDER BY id DESC")->queryOne();
-            //     $data = $connection->createCommand("SELECT *, count(a.range_day_service) as c_service FROM cases AS a 
-            //       INNER JOIN symptom AS b ON b.id=a.symptomp
-            //       INNER JOIN count_symptom AS c ON c.symptom=b.id
-            //       INNER JOIN count_cluster AS d ON d.kmeans_type=c.kmeans_type
-            //       WHERE date(a.date_open)>='$date[start_date]' AND date(a.date_open)<='$date[end_date]' AND a.symptomp='$model->symptom' AND a.regional IS NOT NULL AND c.symptom='$model->symptom' ORDER BY c_service DESC")->queryOne();
+            [
+              'attribute' => 'dominan',
+              'format' => 'raw',
+              'value' => function($model) use ($connection){
+                $date = $connection->createCommand("SELECT * FROM count_cluster WHERE kmeans_type='$model->kmeans_type' ORDER BY id DESC")->queryOne();
+                $data = $connection->createCommand("SELECT *, count(a.range_day_service) as c_service FROM cases AS a 
+                  INNER JOIN symptom AS b ON b.id=a.symptomp
+                  INNER JOIN count_symptom AS c ON c.symptom=b.id
+                  INNER JOIN count_cluster AS d ON d.kmeans_type=c.kmeans_type
+                  WHERE date(a.date_open)>='$date[start_date]' AND date(a.date_open)<='$date[end_date]' AND a.symptomp='$model->symptom' AND a.regional IS NOT NULL AND c.symptom='$model->symptom' ORDER BY c_service DESC")->queryOne();
                   
-            //       // if($data['range_day_service'] == '0'):
-            //       //   $text = "<span><span class='label label-success'>Mudah</span></span>";
-            //       // elseif($data['range_day_service'] == '1' || $data['range_day_service'] == '2'):
-            //       //   $text = "<span><span class='label label-warning'>Normal</span></span>";
-            //       // elseif($data['range_day_service'] > '2'):
-            //       //   $text = "<span><span class='label label-danger'>Sulit</span></span>";
-            //       // else:
-            //       //   $text = "<span><span class='label label-danger'>On Progress</span></span>";
-            //       // endif;
+                  // if($data['range_day_service'] == '0'):
+                  //   $text = "<span><span class='label label-success'>Mudah</span></span>";
+                  // elseif($data['range_day_service'] == '1' || $data['range_day_service'] == '2'):
+                  //   $text = "<span><span class='label label-warning'>Normal</span></span>";
+                  // elseif($data['range_day_service'] > '2'):
+                  //   $text = "<span><span class='label label-danger'>Sulit</span></span>";
+                  // else:
+                  //   $text = "<span><span class='label label-danger'>On Progress</span></span>";
+                  // endif;
                   
-            //       if($data['range_day_service'] == '0'):
-            //         $text = "Mudah";
-            //       elseif($data['range_day_service'] == '1' || $data['range_day_service'] == '2'):
-            //         $text = "Normal";
-            //       elseif($data['range_day_service'] > '2'):
-            //         $text = "Sulit";
-            //       else:
-            //         $text = "On Progress";
-            //       endif;
+                  if($data['range_day_service'] == '0'):
+                    $text = "Mudah";
+                  elseif($data['range_day_service'] == '1' || $data['range_day_service'] == '2'):
+                    $text = "Normal";
+                  elseif($data['range_day_service'] > '2'):
+                    $text = "Sulit";
+                  else:
+                    $text = "On Progress";
+                  endif;
 
-            //     return $text;
-            //   },
-            //   // 'filter' => ['Mudah' => 'Mudah', 'Normal' => 'Normal', 'Sulit' => 'Sulit'],
-            //   'filter' => false,
-            //   'headerOptions' => ['id' => 'dominan-case','style'=>"width:100px;text-align:center;"],
-            //   'contentOptions' => ['id' => 'dominan-case-child','style'=>"width:100px;text-align:center;"],
-            // ],
+                return $text;
+              },
+              // 'filter' => ['Mudah' => 'Mudah', 'Normal' => 'Normal', 'Sulit' => 'Sulit'],
+              'filter' => false,
+              'headerOptions' => ['id' => 'dominan-case','style'=>"width:100px;text-align:center;"],
+              'contentOptions' => ['id' => 'dominan-case-child','style'=>"width:100px;text-align:center;"],
+            ],
             [
               'class' => 'yii\grid\CheckboxColumn',
               'contentOptions' => ['style'=>"vertical-align:middle;text-align:center;"],

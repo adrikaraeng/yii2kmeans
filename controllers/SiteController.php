@@ -617,6 +617,34 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post())){
           $start_date = $_POST['CountCluster']['start_date'];
           $end_date = $_POST['CountCluster']['end_date'];
+          $jumlah_cluster = $_POST['CountCluster']['jumlah_cluster'];
+
+          $cek_data_change = $connection->createCommand("SELECT * FROM count_cluster WHERE start_date='$start_date' AND end_date='$end_date' AND jumlah_cluster='$jumlah_cluster'")->queryOne();
+          if($cek_data_change == NULL):
+  
+            $set_null_xy = $connection->createCommand("UPDATE cases SET val_uniqx=NULL,val_uniqy=NULL WHERE DATE(date_open)>='$start_date' AND DATE(date_open)<='$end_date'")->execute();
+  
+            $cek_dataCases = $connection->createCommand("SELECT * FROM cases WHERE DATE(date_open)>='$start_date' AND DATE(date_open)<='$end_date'")->queryAll();
+            foreach($cek_dataCases as $c_datacases => $cdc):
+              $onex = rand(1,10);
+              $oney = rand(1,10);
+              $secondx = rand(11,20);
+              $secondy = rand(11,20);
+              $thirdx = rand(21,30);
+              $thirdy = rand(21,30);
+              if($cdc['range_day_service'] == '0'):
+                  $uniqx = $onex;
+                  $uniqy = $oney;
+              elseif($cdc['range_day_service'] == '1' || $cdc['range_day_service'] == '2'):
+                  $uniqx = $secondx;
+                  $uniqy = $secondy;
+              elseif($cdc['range_day_service'] > '2'):
+                  $uniqx = $thirdx;
+                  $uniqy = $thirdy;
+              endif;
+              $update_row = $connection->createCommand("UPDATE cases SET val_uniqx='$uniqx', val_uniqy='$uniqy' WHERE DATE(date_open)>='$start_date' AND DATE(date_open)<='$end_date' AND id='$cdc[id]'")->execute();
+            endforeach;
+          endif;
 
           $cek_if_login_available = $connection->createCommand("SELECT * FROM count_cluster WHERE login='$user->id' AND kmeans_type='symtomp'")->queryAll();
           if($cek_if_login_available){
@@ -664,6 +692,7 @@ class SiteController extends Controller
               $model2->login = $user->id;
               $model2->save();
             }
+            
           }else{
             $del_login = $connection->createCommand("DELETE FROM count_cluster WHERE `login`='$user->id' AND kmeans_type='symtomp'")->execute();
           }

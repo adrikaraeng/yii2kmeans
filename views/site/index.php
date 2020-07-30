@@ -17,7 +17,23 @@ foreach($cek_date_close as $c_dc => $row):
     $date_new = date_create(date('Y-m-d', strtotime($row['date_closed'])));
     $diff = date_diff($date_old, $date_new);
 
-    $update_row = $connection->createCommand("UPDATE cases SET range_day_service='$diff->d' WHERE range_day_service IS NULL AND id='$row[id]'")->execute();
+    $onex = rand(1,10);
+    $oney = rand(1,10);
+    $secondx = rand(11,20);
+    $secondy = rand(11,20);
+    $thirdx = rand(21,30);
+    $thirdy = rand(21,30);
+    if($diff->d == '0'):
+        $uniqx = $onex;
+        $uniqy = $oney;
+    elseif($diff->d == '1' || $diff->d == '2'):
+        $uniqx = $secondx;
+        $uniqy = $secondy;
+    elseif($diff->d > '2'):
+        $uniqx = $thirdx;
+        $uniqy = $thirdy;
+    endif;
+    $update_row = $connection->createCommand("UPDATE cases SET range_day_service='$diff->d', val_uniqx='$uniqx', val_uniqy='$uniqy' WHERE range_day_service IS NULL AND id='$row[id]'")->execute();
 endforeach;
 
 ?>

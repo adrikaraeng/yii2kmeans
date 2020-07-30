@@ -3,8 +3,8 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$this->registerCssFile('@web/css/morris.css');
-$this->registerJsFile('@web/morrisjs/morris.js');
+// $this->registerCssFile('@web/css/morris.css');
+// $this->registerJsFile('@web/morrisjs/morris.js');
 $connection = \Yii::$app->db;
 
 if($t == 'symtomp'){
@@ -12,8 +12,62 @@ if($t == 'symtomp'){
 }else{
   $title = 'Teknisi';
 }
+
 $max_iterasi = $connection->createCommand("SELECT max(iterasi) FROM list_centroid WHERE kmeans_type='$t'")->queryScalar();
 $list_count_cluster = $connection->createCommand("SELECT * FROM list_centroid WHERE kmeans_type='$t' AND iterasi='$max_iterasi' GROUP BY cluster ORDER BY cluster ASC")->queryAll();
+
+$date_selected = $connection->createCommand("SELECT * FROM count_cluster ORDER BY id DESC")->queryOne();
+$get_mudah = $connection->createCommand("SELECT *,b.symptom AS b_symtomp, c.regional AS c_regional, d.nama_witel AS d_witel FROM cases AS a 
+LEFT JOIN symptom AS b ON b.id=a.symptomp 
+LEFT JOIN regional AS c ON c.id=a.regional 
+LEFT JOIN witel AS d ON d.id=a.witel 
+WHERE DATE(date_open)>='$date_selected[start_date]' AND DATE(date_open) <= '$date_selected[end_date]' AND range_day_service='0'")->queryAll();
+$get_normal = $connection->createCommand("SELECT *,b.symptom AS b_symtomp, c.regional AS c_regional, d.nama_witel AS d_witel FROM cases AS a 
+LEFT JOIN symptom AS b ON b.id=a.symptomp 
+LEFT JOIN regional AS c ON c.id=a.regional 
+LEFT JOIN witel AS d ON d.id=a.witel 
+WHERE DATE(date_open)>='$date_selected[start_date]' AND DATE(date_open) <= '$date_selected[end_date]' AND range_day_service='1' OR DATE(date_open)>='$date_selected[start_date]' AND DATE(date_open) <= '$date_selected[end_date]' AND range_day_service='2'")->queryAll();
+$get_sulit = $connection->createCommand("SELECT *,b.symptom AS b_symtomp, c.regional AS c_regional, d.nama_witel AS d_witel FROM cases AS a 
+LEFT JOIN symptom AS b ON b.id=a.symptomp 
+LEFT JOIN regional AS c ON c.id=a.regional 
+LEFT JOIN witel AS d ON d.id=a.witel 
+WHERE DATE(date_open)>='$date_selected[start_date]' AND DATE(date_open) <= '$date_selected[end_date]' AND range_day_service>'2'")->queryAll();
+
+$serv_mudahx = [];
+$serv_mudahy = [];
+$title_mudah = [];
+
+$serv_normalx = [];
+$serv_normaly = [];
+$title_normal = [];
+
+$serv_sulitx = [];
+$serv_sulity = [];
+$title_sulit = [];
+
+$c_mudah = 0;
+$c_normal = 0;
+$c_sulit = 0;
+
+foreach($get_mudah as $g_mudah => $gm):
+  $serv_mudahx[] = $gm['val_uniqx'];
+  $serv_mudahy[] = $gm['val_uniqy'];
+  $title_mudah[] = $gm['trouble_ticket'].'['.$gm['b_symtomp'].']<br>Regional: '.$gm['c_regional'].'/'.$gm['d_witel'].'/'.$gm['datel'].'<br>Handling: '.$gm['amcrew'];
+  $c_mudah++;
+endforeach;
+
+foreach($get_normal as $g_normal => $gn):
+  $serv_normalx[] = $gn['val_uniqx'];
+  $serv_normaly[] = $gn['val_uniqy'];
+  $title_normal[] = $gn['trouble_ticket'].'['.$gn['b_symtomp'].']<br>Regional: '.$gn['c_regional'].'/'.$gn['d_witel'].'/'.$gn['datel'].'<br>Handling: '.$gn['amcrew'];
+  $c_normal++;
+endforeach;
+foreach($get_sulit as $g_sulit => $gs):
+  $serv_sulitx[] = $gs['val_uniqx'];
+  $serv_sulity[] = $gs['val_uniqy'];
+  $title_sulit[] = $gs['trouble_ticket'].'['.$gs['b_symtomp'].']<br>Regional: '.$gs['c_regional'].'/'.$gs['d_witel'].'/'.$gs['datel'].'<br>Handling: '.$gs['amcrew'];
+  $c_sulit++;
+endforeach;
 
 $cluster2 = [];
 $sum_value = [];
@@ -57,7 +111,13 @@ endforeach;
   </div>
 
   <div style="clear:left;"></div>
+  <div id="chart_scatter_poin">
+    <div style="text-align:center;font-weight:bold;">Count by Services</div>
+    <div id="chartContainer" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
+  </div>
 </div>
+
+<script src="<?=Yii::getAlias('@web/canvasjs-2.3.1/canvasjs.min.js')?>"></script>
 <script type="text/javascript">
 	var $katColors = ['#ca001f', '#02c89b', '#ca00a7', '#fca570', '#61c505', '#035bc7', '#7901c9', '#f0910f', '#9c6372', '#656049', '#e91b53', '#d6e41f', '#60c1f0', '#f4d25b', '#c2eb65', '#94bc9a', '#cbba85', '#9ca2b4'];
 	$data_count = [
@@ -123,4 +183,87 @@ endforeach;
     // alert (row.count_cluster);
     window.open('display-data?id='+row.cekid2+'&type=symptom','_blank');
   }
+
+  
+
+var chart = new CanvasJS.Chart("chartContainer", {
+	animationEnabled: true,
+	zoomEnabled: true,
+	title:{
+		text: ""
+	},
+	axisX: {
+    title:"",
+    tickLength: 0,
+    // lineThickness: 0,
+		// minimum: 790,
+    // maximum: 2260
+    labelFormatter: function(){
+      return " ";
+    }
+	},
+	axisY:{
+		title: "",
+    tickLength: 0,
+    // lineThickness: 0,
+    // valueFormatString: "$#,##0k"
+    labelFormatter: function(){
+      return " ";
+    }
+	},
+  legend: {
+      horizontalAlign: "left", // "center" , "right"
+      verticalAlign: "center",  // "top" , "bottom"
+      fontSize: 15
+  },
+	data: [{
+    type: "scatter",
+    name: "Mudah",
+    markerColor: "#0cb859",
+    showInLegend: true, 
+    toolTipContent: "<span style=\"color:#0cb859 \"><b>{m}</b></span>",
+		dataPoints: [
+      <?php for($i=0;$i<$c_mudah;$i++){?>
+      {
+        x: <?=$serv_mudahx[$i]?>,
+        y: <?=$serv_mudahy[$i]?>,
+        m: "<?=$title_mudah[$i]?>",
+      },
+      <?php }?>
+    ]
+  },
+  {
+    type: "scatter",
+    name: "Normal",
+    markerColor: "#dcb414",
+    showInLegend: true, 
+    toolTipContent: "<span style=\"color:#dcb414 \"><b>{m}</b></span>",
+		dataPoints: [
+      <?php for($i=0;$i<$c_normal;$i++){?>
+      {
+        x: <?=$serv_normalx[$i]?>,
+        y: <?=$serv_normaly[$i]?>,
+        m: "<?=$title_normal[$i]?>",
+      },
+      <?php }?>
+    ]
+  },{
+    type: "scatter",
+    name: "Sulit",
+    markerColor: "#bf0409",
+    showInLegend: true, 
+    toolTipContent: "<span style=\"color:#bf0409 \"><b>{m}</b></span>",
+		dataPoints: [
+      <?php for($i=0;$i<$c_sulit;$i++){?>
+      {
+        x: <?=$serv_sulitx[$i]?>,
+        y: <?=$serv_sulity[$i]?>,
+        m: "<?=$title_sulit[$i]?>",
+      },
+      <?php }?>
+    ]
+  },
+  ]
+});
+chart.render();
 </script>

@@ -129,26 +129,27 @@
           <div id="sum_cluster" style="height: 500px;background-color:transparent;"></div>
       </div>
     </div>
+
     <?php $id='1'; foreach($list_count_cluster as $lcount => $lcc):?>
     <?php 
       $sql_data_regional = $connection->createCommand("SELECT *,
       SUM(IF(e.iterasi='$lcc[iterasi]' AND e.cluster='$lcc[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date',1,NULL)) AS c_regional, b.regional AS b_regional
-      FROM cases AS a
+      FROM report_data AS a
       INNER JOIN regional AS b ON b.id=a.regional
       INNER JOIN symptom AS c ON c.id=a.symptomp
-      INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
-      INNER JOIN list_centroid AS e ON e.count_symptom=d.id
+      INNER JOIN report_count_symptom AS d ON d.symptom=a.symptomp
+      INNER JOIN report_list_centroid AS e ON e.count_symptom=d.id
       WHERE e.iterasi='$lcc[iterasi]' AND e.cluster='$lcc[cluster]'
       GROUP BY a.regional
       ")->queryAll();
 
       $sql_data_segment = $connection->createCommand("SELECT *,
       SUM(IF(e.iterasi='$lcc[iterasi]' AND e.cluster='$lcc[cluster]' AND date(a.date_open)>='$start_date' AND date(a.date_open)<='$end_date',1,0)) AS c_segment, b.segment AS b_segment
-      FROM cases AS a
+      FROM report_data AS a
       INNER JOIN segment AS b ON b.id=a.segment
       INNER JOIN symptom AS c ON c.id=a.symptomp
-      INNER JOIN count_symptom AS d ON d.symptom=a.symptomp
-      INNER JOIN list_centroid AS e ON e.count_symptom=d.id
+      INNER JOIN report_count_symptom AS d ON d.symptom=a.symptomp
+      INNER JOIN report_list_centroid AS e ON e.count_symptom=d.id
       WHERE e.iterasi='$lcc[iterasi]' AND e.cluster='$lcc[cluster]'
       GROUP BY a.segment
       ")->queryAll();
