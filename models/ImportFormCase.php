@@ -29,7 +29,7 @@ class ImportFormCase extends Model
                 'file',
                 'extensions' => 'xls, xlsx', 
                 'skipOnEmpty' => true,
-                'maxSize' => 1024*1024*10,
+                'maxSize' => 1024*1024*100,
                 'tooBig' => 'File tidak boleh lebih dari 10 Mb',
             ],
         ];
